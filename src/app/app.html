@@ -1,0 +1,1470 @@
+<div class="h-screen bg-[#050506] text-[#E0E0E0] font-mono flex flex-col select-none border-4 border-[#1A1A1C] overflow-hidden">
+  
+  <!-- SIGNAL_SCAN HEADER CHRONOGRAPH -->
+  <header class="flex flex-col sm:flex-row items-center justify-between px-4 py-2 border-b border-[#222] bg-[#0C0C0E] gap-2 flex-shrink-0">
+    <div class="flex items-center gap-3">
+      <div 
+        class="w-3 h-3 rounded-full shadow-[0_0_8px_#00FF41] transition-all duration-300"
+        [ngClass]="(isListening() || isSynthesizing()) ? 'bg-[#00FF41] animate-pulse shadow-[0_0_12px_#00FF41]' : 'bg-[#FF4141] shadow-[0_0_8px_#FF4141]'">
+      </div>
+      <div class="flex flex-col">
+        <h1 class="text-xs font-bold tracking-widest text-[#00FF41]">SIGNAL_SCAN v4.2 // MULTI-WINDOW WORKSTATION</h1>
+        <p class="text-[8px] text-[#666] tracking-wider uppercase font-bold">Dynamic Spectral Analyzer & Encrypted Loopback Decoder</p>
+      </div>
+    </div>
+    
+    <!-- Real-time metrics utilizing pre-bound signals -->
+    <div class="flex flex-wrap items-center gap-4 text-[9px] text-[#888] font-mono bg-[#050506] px-3 py-1 border border-[#222] rounded">
+      <div class="flex gap-1.5 items-center">
+        <span class="text-[#444] font-bold">CORE_CPU:</span>
+        <span class="text-[#00FF41] font-bold min-w-[32px]">{{ cpuString() }}%</span>
+      </div>
+      <div class="flex gap-1.5 items-center">
+        <span class="text-[#444] font-bold">DEV_MEM:</span>
+        <span class="text-[#00FF41] font-bold min-w-[35px]">{{ ramString() }}MB</span>
+      </div>
+      <div class="flex gap-1.5 items-center">
+        <span class="text-[#444] font-bold">BUFF:</span>
+        <span class="text-[#00FF41] font-bold">{{ testBuffer() }}ms</span>
+      </div>
+      <div class="flex gap-1.5 items-center border-l border-[#222] pl-3">
+        <span class="text-[#444] font-bold">UPTIME:</span>
+        <span class="text-[#00FF41] font-bold tracking-widest">{{ uptimeString() }}</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- High-Density Multi-Window Area arranged in master columns -->
+  <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-1.5 bg-[#121214] p-1.5 min-h-0 overflow-y-auto lg:overflow-hidden">
+    
+    <!-- LEFT PANEL SECTION (col-span-1 lg:col-span-3) -->
+    <aside class="col-span-1 lg:col-span-3 flex flex-col gap-1.5 min-h-0 overflow-y-auto pr-0.5">
+      
+      <!-- WINDOW 1: Active Sources & Capture Hub -->
+      <div class="border border-[#222] bg-[#0A0A0B] flex flex-col rounded overflow-hidden">
+        <!-- Title bar -->
+        <div class="px-2 py-1 bg-[#121214] border-b border-[#222] flex items-center justify-between text-[9px] font-bold text-[#888] uppercase tracking-wider">
+          <div class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#00FF41] animate-ping"></span>
+            <span>[W-01] Stream Taps Hub</span>
+          </div>
+          <span class="text-[7.5px] text-[#444] font-bold">SELECT SIGNAL SOURCE</span>
+        </div>
+
+        <!-- Content list of hardware/simulated inputs -->
+        <div class="p-1.5 space-y-1 bg-[#050506]/40">
+          
+          <!-- PID 8422 row -->
+          <div 
+            role="button"
+            tabindex="0"
+            (click)="toggleSource('pid-8422')"
+            (keydown.enter)="toggleSource('pid-8422')"
+            class="p-1.5 border rounded cursor-pointer transition-all flex flex-col gap-0.5 focus:outline-none focus:border-[#00FF41]"
+            [ngClass]="activeSources()['pid-8422'] ? 'bg-[#00FF41]/20 border-[#00FF41] text-[#00FF41]' : 'bg-[#121214]/40 border-[#1A1A1C] text-[#888] hover:border-[#333] hover:text-[#CCC]'">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold font-mono">PID 8422 // GOOGLE CHROME</span>
+              <span class="text-[7px] px-1 rounded uppercase font-bold" [ngClass]="activeSources()['pid-8422'] ? 'bg-[#00FF41]/25 border border-[#00FF41]/40 text-[#00FF41] animate-pulse' : 'bg-[#222] text-[#888]'">
+                {{ activeSources()['pid-8422'] ? 'ACTIVE' : 'STANDBY' }}
+              </span>
+            </div>
+            <p class="text-[8px] truncate leading-tight">Chrome Video Ad Beacon Loopback</p>
+            <div class="flex justify-between items-center text-[7px] text-[#444] font-bold pt-0.5">
+              <span>TARGET FREQ: 440 Hz SINE</span>
+              <span class="text-[#00FF41]/60 font-mono">142.250.190.46</span>
+            </div>
+          </div>
+
+          <!-- PID 9901 row -->
+          <div 
+            role="button"
+            tabindex="0"
+            (click)="toggleSource('pid-9901')"
+            (keydown.enter)="toggleSource('pid-9901')"
+            class="p-1.5 border rounded cursor-pointer transition-all flex flex-col gap-0.5 focus:outline-none focus:border-[#00FF41]"
+            [ngClass]="activeSources()['pid-9901'] ? 'bg-[#00FF41]/20 border-[#00FF41] text-[#00FF41]' : 'bg-[#121214]/40 border-[#1A1A1C] text-[#888] hover:border-[#333] hover:text-[#CCC]'">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold font-mono">PID 9901 // MS EDGE EXT</span>
+              <span class="text-[7px] px-1 rounded uppercase font-bold" [ngClass]="activeSources()['pid-9901'] ? 'bg-[#00FF41]/25 border border-[#00FF41]/40 text-[#00FF41] animate-pulse' : 'bg-[#222] text-[#888]'">
+                {{ activeSources()['pid-9901'] ? 'ACTIVE' : 'STANDBY' }}
+              </span>
+            </div>
+            <p class="text-[8px] truncate leading-tight">Silent Media Portal WebRTC Service</p>
+            <div class="flex justify-between items-center text-[7px] text-[#444] font-bold pt-0.5">
+              <span>TARGET FREQ: 1.2kHz MODULATED</span>
+              <span class="text-[#00FF41]/60 font-mono">204.79.197.200</span>
+            </div>
+          </div>
+
+          <!-- PID 4401 row -->
+          <div 
+            role="button"
+            tabindex="0"
+            (click)="toggleSource('pid-4401')"
+            (keydown.enter)="toggleSource('pid-4401')"
+            class="p-1.5 border rounded cursor-pointer transition-all flex flex-col gap-0.5 focus:outline-none focus:border-[#00FF41]"
+            [ngClass]="activeSources()['pid-4401'] ? 'bg-[#00FF41]/20 border-[#00FF41] text-[#00FF41]' : 'bg-[#121214]/40 border-[#1A1A1C] text-[#888] hover:border-[#333] hover:text-[#CCC]'">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold font-mono">PID 4401 // LOCAL ALARM</span>
+              <span class="text-[7px] px-1 rounded uppercase font-bold" [ngClass]="activeSources()['pid-4401'] ? 'bg-[#00FF41]/25 border border-[#00FF41]/40 text-[#00FF41] animate-pulse' : 'bg-[#222] text-[#888]'">
+                {{ activeSources()['pid-4401'] ? 'ACTIVE' : 'STANDBY' }}
+              </span>
+            </div>
+            <p class="text-[8px] truncate leading-tight">Emergency Burst Siren WebRTC Helper</p>
+            <div class="flex justify-between items-center text-[7px] text-[#444] font-bold pt-0.5">
+              <span>TARGET FREQ: 1.8kHz PULSED</span>
+              <span class="text-[#00FF41]/70 font-mono">127.0.0.1</span>
+            </div>
+          </div>
+
+          <!-- Custom Oscillator row with integrated sweep controls -->
+          <div 
+            class="p-2 border rounded transition-all flex flex-col gap-1.5 focus-within:border-[#00FF41]"
+            [ngClass]="activeSources()['osc'] ? 'bg-[#00FF41]/10 border-[#00FF41] text-[#00FF41]' : 'bg-[#121214]/40 border-[#1A1A1C] text-[#888] hover:border-[#333] hover:text-[#CCC]'">
+            <div 
+              role="button"
+              tabindex="0"
+              (click)="toggleSource('osc')"
+              (keydown.enter)="toggleSource('osc')"
+              class="flex items-center justify-between font-mono cursor-pointer select-none outline-none">
+              <span class="text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                <mat-icon style="font-size: 11px; width: 11px; height: 11px; line-height: 11px;">tune</mat-icon>
+                OSCILLATOR SYNTH WAVES
+              </span>
+              <span class="text-[7px] px-1.5 py-0.2 rounded uppercase font-bold" [ngClass]="activeSources()['osc'] ? 'bg-[#00FF41] text-black font-extrabold animate-pulse' : 'bg-[#222] text-[#888]'">
+                {{ activeSources()['osc'] ? 'ACTIVE' : 'STANDBY' }}
+              </span>
+            </div>
+            
+            <p class="text-[8px] leading-tight">Direct Manual Signal Waveform Sweeper & Tuner</p>
+            
+            <!-- Quick preset tunes -->
+            <div class="grid grid-cols-4 gap-1 pt-0.5">
+              <button 
+                type="button"
+                (click)="$event.stopPropagation(); updateManualFreq(50)"
+                class="py-1 bg-[#121214] border border-[#222]/80 hover:border-[#00FF41] text-[#BBB] hover:text-[#00FF41] font-bold rounded cursor-pointer text-center text-[7.5px] transition-all">
+                50 Hz
+              </button>
+              <button 
+                type="button"
+                (click)="$event.stopPropagation(); updateManualFreq(60)"
+                class="py-1 bg-[#121214] border border-[#222]/80 hover:border-[#00FF41] text-[#BBB] hover:text-[#00FF41] font-bold rounded cursor-pointer text-center text-[7.5px] transition-all">
+                60 Hz
+              </button>
+              <button 
+                type="button"
+                (click)="$event.stopPropagation(); updateManualFreq(440)"
+                class="py-1 bg-[#121214] border border-[#222]/80 hover:border-[#00FF41] text-[#BBB] hover:text-[#00FF41] font-bold rounded cursor-pointer text-center text-[7.5px] transition-all">
+                440 Hz
+              </button>
+              <button 
+                type="button"
+                (click)="$event.stopPropagation(); updateManualFreq(1200)"
+                class="py-1 bg-[#121214] border border-[#222]/80 hover:border-[#00FF41] text-[#BBB] hover:text-[#00FF41] font-bold rounded cursor-pointer text-center text-[7.5px] transition-all">
+                1.2 k
+              </button>
+            </div>
+
+            <!-- Integrated Slider -->
+            <div class="pt-1 select-none">
+              <div class="flex justify-between text-[7px] font-bold text-[#666] mb-0.5">
+                <span>TUNER FREQUENCY:</span>
+                <span class="text-[#00FF41] font-bold">{{ manualSynthFreq() }} Hz</span>
+              </div>
+              <input 
+                type="range" 
+                min="20" 
+                max="12000" 
+                step="1"
+                [ngModel]="manualSynthFreq()"
+                (ngModelChange)="updateManualFreq($event)"
+                (click)="$event.stopPropagation()"
+                class="w-full h-1 bg-[#222] appearance-none cursor-pointer accent-[#00FF41] outline-none" />
+            </div>
+          </div>
+
+          <!-- Live Physical Microphone Input row -->
+          <div 
+            role="button"
+            tabindex="0"
+            (click)="toggleSource('mic')"
+            (keydown.enter)="toggleSource('mic')"
+            class="p-1.5 border rounded cursor-pointer transition-all flex flex-col gap-0.5 focus:outline-none focus:border-[#FF7F00]"
+            [ngClass]="activeSources()['mic'] ? 'bg-[#FF7F00]/20 border-[#FF7F00] text-[#FF7F00]' : 'bg-[#121214]/40 border-[#1A1A1C] text-[#888] hover:border-[#333] hover:text-[#CCC]'">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold font-mono" [ngClass]="activeSources()['mic'] ? 'text-[#FF7F00]' : ''">LIVE MICROPHONE DEVICE</span>
+              <span 
+                class="text-[7px] px-1 rounded border uppercase font-bold"
+                [ngClass]="activeSources()['mic'] ? 'bg-[#FF7F00]/25 border-[#FF7F00]/40 text-[#FF7F00] animate-pulse' : 'bg-[#222] border-transparent text-[#555]'">
+                {{ activeSources()['mic'] ? 'STREAMING' : 'READY_TAP' }}
+              </span>
+            </div>
+            <p class="text-[8px] truncate leading-tight">Physical Mic Acoustic Audio Frequency Capture</p>
+            <div class="flex justify-between items-center text-[7px] text-[#444] font-bold pt-0.5" [ngClass]="activeSources()['mic'] ? 'text-[#FF7F00]/60' : ''">
+              <span>TARGET FREQ: DYNAMIC SPECTRUM</span>
+              <span class="font-mono text-[#FF7F00]/55">CLIENT CARD</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- WINDOW 2: Dynamic Decryption Gateway (IP Prominently Displayed) -->
+      <div class="border border-[#222] bg-[#0A0A0B] flex flex-col rounded overflow-hidden">
+        <div class="px-2 py-1 bg-[#121214] border-b border-[#222] flex items-center justify-between text-[9px] font-bold text-[#888] uppercase tracking-wider">
+          <div class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 bg-[#00FF41] rounded-full" [ngClass]="activeFeed() !== 'none' ? 'animate-pulse' : 'opacity-40'"></span>
+            <span>[W-02] Active Gateway Spec</span>
+          </div>
+          <span class="text-[8px] text-[#00FF41] font-mono font-bold">{{ activeFeed() !== 'none' ? 'LINK_ACTIVE' : 'STANDBY' }}</span>
+        </div>
+
+        <div class="p-2.5 space-y-2 bg-[#050506]/90 font-mono text-[9px]">
+          <!-- ULTRA HIGH VISIBILITY IP ADDRESS DISPLAY -->
+          <div class="bg-[#121214] border border-[#222] p-2 rounded relative overflow-hidden">
+            <div class="text-[7.5px] text-[#444] uppercase font-bold tracking-widest block mb-1">RECOGNIZED SOURCE ENDPOINT IP:</div>
+            <div class="text-xs font-bold text-[#00F0FF] tracking-wider select-text flex items-center gap-1.5 min-w-0">
+              <mat-icon class="text-[12px] h-3 w-3 flex items-center justify-center text-[#00F0FF]">lan</mat-icon>
+              <span class="truncate" [title]="activeSourceIP()">{{ activeSourceIP() }}</span>
+            </div>
+            <div class="absolute -bottom-1 right-1 opacity-[0.03] select-none text-[32px] font-extrabold text-[#00F0FF]">SOURCE</div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-1.5 text-[8.5px] text-[#888]">
+            <div class="bg-[#121214]/60 border border-[#1C1C1F] p-1.5 rounded flex flex-col">
+              <span class="text-[6.5px] text-[#444] font-bold uppercase">Source CodeName</span>
+              <span class="text-[#E0E0E0] font-bold truncate mt-0.5" [title]="activeFeedDetails().name">{{ activeFeedDetails().name }}</span>
+            </div>
+            <div class="bg-[#121214]/60 border border-[#1C1C1F] p-1.5 rounded flex flex-col">
+              <span class="text-[6.5px] text-[#444] font-bold uppercase">System Descriptor</span>
+              <span class="text-[#E0E0E0] font-bold truncate mt-0.5" [title]="activeFeedDetails().type">{{ activeFeedDetails().type }}</span>
+            </div>
+            <div class="bg-[#121214]/60 border border-[#1C1C1F] p-1.5 rounded flex flex-col">
+              <span class="text-[6.5px] text-[#444] font-bold uppercase">Security Encoding</span>
+              <span class="text-[#00FF41] font-bold truncate mt-0.5">{{ activeFeedDetails().security }}</span>
+            </div>
+            <div class="bg-[#121214]/60 border border-[#1C1C1F] p-1.5 rounded flex flex-col">
+              <span class="text-[6.5px] text-[#444] font-bold uppercase">Decoded Audio Codec</span>
+              <span class="text-[#FF7F00] font-bold truncate mt-0.5">{{ activeFeedDetails().audioCodec }}</span>
+            </div>
+            <div class="bg-[#121214]/60 border border-[#1C1C1F] p-1.5 rounded flex flex-col">
+              <span class="text-[6.5px] text-[#444] font-bold uppercase">A/V Frame Index</span>
+              <span class="text-[#EEE] font-bold mt-0.5">{{ activeFeedDetails().fps }} FPS</span>
+            </div>
+            <div class="bg-[#121214]/60 border border-[#1C1C1F] p-1.5 rounded flex flex-col">
+              <span class="text-[6.5px] text-[#444] font-bold uppercase">Bitrate Overhead</span>
+              <span class="text-[#00FF41] font-bold mt-0.5 truncate">{{ activeFeedDetails().bitrate }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WINDOW 3: Biquad Custom Filter Controls -->
+      <div class="border border-[#222] bg-[#0A0A0B] flex flex-col rounded overflow-hidden">
+        <div class="px-2 py-1 bg-[#121214] border-b border-[#222] flex items-center justify-between text-[9px] font-bold text-[#888] uppercase tracking-wider">
+          <div class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#FF7F00]"></span>
+            <span>[W-03] Filter Network</span>
+          </div>
+          <button 
+            (click)="toggleFilterEnabled(!filterEnabled())"
+            class="text-[7.5px] px-1.5 py-0.2 rounded font-mono border transition-all cursor-pointer font-bold"
+            [ngClass]="filterEnabled() ? 'bg-[#00FF41] text-black border-[#00FF41]' : 'bg-transparent text-[#666] border-[#333]'">
+            {{ filterEnabled() ? 'ENABLED' : 'BYPASS' }}
+          </button>
+        </div>
+
+        <div class="p-2.5 space-y-2 bg-[#050506]/35 text-[9px] font-mono min-h-[92px] flex flex-col justify-center">
+          @if (filterEnabled()) {
+            <div class="space-y-2">
+              <div class="grid grid-cols-3 gap-1">
+                @for (t of ['lowpass', 'highpass', 'bandpass']; track t) {
+                  <button 
+                    (click)="changeFilterType(t)"
+                    class="py-0.5 text-[7px] border uppercase rounded transition-all cursor-pointer font-bold text-center"
+                    [ngClass]="filterType() === t ? 'bg-[#00FF41]/10 border-[#00FF41] text-[#00FF41]' : 'bg-[#050506] border-[#222] text-[#444] hover:text-[#666]'">
+                    {{ t }}
+                  </button>
+                }
+              </div>
+
+              <div>
+                <div class="flex justify-between text-[7px] text-[#666]">
+                  <span>CUTOFF FREQUENCY:</span>
+                  <span class="text-[#00FF41] font-bold">{{ filterCutoff() }} Hz</span>
+                </div>
+                <input 
+                  type="range" 
+                  min="40" 
+                  max="16000" 
+                  step="10"
+                  [ngModel]="filterCutoff()"
+                  (ngModelChange)="updateFilterCutoff($event)"
+                  class="w-full h-1 bg-[#222] appearance-none cursor-pointer accent-[#00FF41]" />
+              </div>
+
+              <div>
+                <div class="flex justify-between text-[7px] text-[#666]">
+                  <span>RESONANCE Q FACTOR:</span>
+                  <span class="text-[#00FF41] font-bold">{{ filterQ() | number:'1.2-2' }}</span>
+                </div>
+                <input 
+                  type="range" 
+                  min="0.1" 
+                  max="15" 
+                  step="0.1"
+                  [ngModel]="filterQ()"
+                  (ngModelChange)="updateFilterQ($event)"
+                  class="w-full h-1 bg-[#222] appearance-none cursor-pointer accent-[#00FF41]" />
+              </div>
+            </div>
+          } @else {
+            <p class="text-[8.5px] text-[#444] italic text-center leading-normal py-2">
+              * Equalizer filters currently bypassed.<br>Click ENABLED icon above to filter active frequency noise spikes.
+            </p>
+          }
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- CENTER VISUAL VIEWPORT COLUMN: Spectrum Analyzer Matrix (col-span-1 lg:col-span-6) -->
+    <main class="col-span-1 lg:col-span-6 flex flex-col gap-1.5 min-h-0 overflow-y-auto lg:overflow-hidden border-x border-[#1C1C1F]/40 pb-4 lg:pb-0">
+      
+      <!-- WINDOW 4: High Definition Spectrogram & Signal Locking Arena -->
+      <div class="flex-grow border border-[#222] bg-[#050507] rounded overflow-hidden flex flex-col relative min-h-0">
+        <!-- Title bar -->
+        <div class="px-2.5 py-1.5 bg-[#0C0C0E] border-b border-[#222] flex items-center justify-between text-[9.5px] font-bold text-[#888] uppercase tracking-wider flex-shrink-0">
+          <div class="flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#00FF41] animate-ping"></span>
+            <span>[W-04] Live Multi-Channel Spectral Scope</span>
+          </div>
+          <button 
+            (click)="scopeType.set(scopeType() === 'fft' ? 'wave' : 'fft')"
+            class="text-[7.5px] border border-[#333] hover:border-[#00FF41] hover:text-[#00FF41] px-2 py-0.5 rounded text-[#888] bg-[#121214] font-bold uppercase transition-all tracking-wide cursor-pointer flex items-center gap-1">
+            <mat-icon class="text-[9px] h-2 w-2 flex items-center justify-center font-bold">query_stats</mat-icon>
+            RENDER: {{ scopeType() === 'fft' ? 'FFT_COLUMNS' : 'OSCILLOSCOPE' }}
+          </button>
+        </div>
+
+        <div class="flex-grow p-2.5 flex flex-col relative min-h-0 overflow-hidden">
+          
+          <!-- Outer Header overlay displaying ACTIVE IP Address and Locked frequencies -->
+          <div class="mb-1.5 flex justify-between items-center text-[8.5px] font-mono flex-shrink-0 bg-[#0C0C0E]/90 border border-[#222] p-1.5 rounded">
+            <div class="flex items-center gap-2">
+              <span class="text-[#555] font-bold uppercase tracking-wider">GATEWAY TARGET IP:</span>
+              <span class="text-[#00FF41] font-bold tracking-widest pl-1 border-l border-[#222] select-text">
+                {{ activeFeedDetails().ip }}
+              </span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="text-[#555] font-bold uppercase">MODE:</span>
+              <span class="px-1 py-0.2 bg-[#121214] border border-[#222] text-[#00F0FF] rounded font-mono font-bold">{{ scopeType() === 'fft' ? 'FAST_FOURIER_TRANSFORM' : 'TIME_DOMAIN_WAVE' }}</span>
+            </div>
+          </div>
+
+          <!-- Interactive canvas area -->
+          <div class="flex-grow relative border border-[#222] bg-[#030304] rounded p-1 overflow-hidden min-h-0">
+            <canvas #canvasElement class="w-full h-full block min-h-0"></canvas>
+            
+            <!-- Floating telemetry values layout overlays -->
+            <div class="absolute top-2.5 left-2.5 flex flex-col gap-1.5 pointer-events-none">
+              <div class="p-1 px-2 bg-[#050505]/95 border border-[#1C1C1F] rounded text-[9px] font-mono leading-none backdrop-blur shadow-md">
+                <span class="text-[#555] text-[7px] font-extrabold block mb-0.5 uppercase tracking-wider">Spectrum Center Peak</span>
+                <span class="text-[#00FF41] font-bold text-center block">{{ currentPeakFreq() | number:'1.0-1' }} Hz</span>
+              </div>
+              <div class="p-1 px-2 bg-[#050504]/95 border border-[#1C1C1F] rounded text-[9px] font-mono leading-none backdrop-blur shadow-md">
+                <span class="text-[#555] text-[7px] font-extrabold block mb-0.5 uppercase tracking-wider">Aggregate Sound DB energy</span>
+                <span [ngClass]="currentVolumeDb() > -40 ? 'text-[#FF4141]' : 'text-[#00FF41]'" class="font-bold text-center block">
+                  {{ currentVolumeDb() | number:'1.1-1' }} dB
+                </span>
+              </div>
+            </div>
+
+            <!-- Signal lock alerts banner -->
+            @if (isMatched()) {
+              <div class="absolute top-2.5 right-2.5 px-3 py-1 bg-[#FF4141] text-black font-extrabold text-[9px] tracking-widest animate-pulse pointer-events-none border border-[#FF4141] shadow-[0_0_12px_#FF4141] rounded uppercase font-mono flex items-center gap-1">
+                <mat-icon class="text-[11px] h-3 w-3 flex items-center justify-center font-bold">gpp_maybe</mat-icon>
+                <span>FREQUENCY COHERENCE DETECTED</span>
+              </div>
+            } @else {
+              <div class="absolute top-2.5 right-2.5 px-2 py-0.5 bg-[#121214]/90 text-[#444] font-bold text-[7.5px] tracking-widest border border-[#222] rounded uppercase font-mono">
+                SCANNING CHANNELS...
+              </div>
+            }
+
+            <!-- Bottom spectrum coordinate tick marks (Simulated for visual depth) -->
+            <div class="absolute bottom-1 right-2 left-2 flex justify-between text-[6.5px] text-[#444] font-mono pointer-events-none">
+              <span>20 Hz</span>
+              <span>100 Hz</span>
+              <span>500 Hz</span>
+              <span>1 kHz</span>
+              <span>4 kHz</span>
+              <span>12 kHz</span>
+              <span>20 kHz</span>
+            </div>
+          </div>
+
+          <!-- Master classification telemetry statistics -->
+          <div class="mt-2 grid grid-cols-3 gap-2 flex-shrink-0">
+            
+            <!-- Probability match gauge -->
+            <div class="border p-2 bg-[#0C0C0E]/70 rounded transition-all duration-300 flex flex-col justify-between" [ngClass]="isMatched() ? 'border-[#FF4141] bg-[#1A0507]' : 'border-[#222]'">
+              <div class="text-[7.5px] text-[#555] flex items-center gap-1.5 uppercase font-bold tracking-wider mb-2">
+                <span class="w-1.5 h-1.5 rounded-full" [ngClass]="isMatched() ? 'bg-[#FF4141] animate-ping' : 'bg-[#00FF41]'"></span>
+                <span>Signal Fingerprint Confidence</span>
+              </div>
+              <div class="text-center py-1">
+                <span class="text-lg font-bold font-mono tracking-widest" [ngClass]="isMatched() ? 'text-[#FF4141]' : activeColorClass()">
+                  {{ vectorMatch() | number:'1.1-1' }}%
+                </span>
+                <span class="text-[6.5px] text-[#444] font-bold block uppercase truncate mt-0.5" title="{{ currentActiveProfile()?.name || 'GENERIC AUDIO INPUT' }}">
+                  PATTERN: {{ currentActiveProfile()?.name || 'GENERIC' }}
+                </span>
+              </div>
+              <div class="h-1 bg-[#121214] rounded-full overflow-hidden w-full mt-1.5">
+                <div class="h-full transition-all duration-150" [ngClass]="isMatched() ? 'bg-[#FF4141]' : activeBgClass()" [style.width.%]="vectorMatch()"></div>
+              </div>
+            </div>
+
+            <!-- Signal categorization classifier details -->
+            <div class="border border-[#222] p-2 bg-[#0C0C0E]/70 rounded flex flex-col justify-between">
+              <span class="text-[7.5px] text-[#555] uppercase font-bold tracking-wider block mb-2">Decoded Classification</span>
+              <div class="text-center py-1 px-0.5">
+                <div class="text-[9.5px] font-mono font-bold uppercase tracking-tight truncate" [ngClass]="activeColorClass()" title="{{ signalClassification() }}">
+                  {{ signalClassification().includes('(') ? signalClassification().substring(0, signalClassification().indexOf('(')) : signalClassification() }}
+                </div>
+                <div class="text-[6.5px] text-[#555] font-mono tracking-wider mt-1 border-t border-[#1C1C1F] pt-1 truncate leading-relaxed">
+                  {{ signalClassification().includes('(') ? signalClassification().substring(signalClassification().indexOf('(')) : 'SPECTRAL CONVERGENCE' }}
+                </div>
+              </div>
+              <div class="flex justify-between items-center text-[5.5px] text-[#444] font-mono border-t border-[#1C1C1F] pt-1">
+                <span>PEAK RATE: REALTIME</span>
+                <span>BIAS: LOW_PASS</span>
+              </div>
+            </div>
+
+            <!-- Visualizer options -->
+            <div class="border border-[#222] p-2 bg-[#0C0C0E]/70 rounded flex flex-col justify-between">
+              <span class="text-[7.5px] text-[#555] uppercase font-bold tracking-wider block mb-1">Visual Settings</span>
+              <div class="space-y-1 text-[8px] font-mono">
+                <div class="flex justify-between items-center text-[6.5px] text-[#666]">
+                  <span>Scope Gain</span>
+                  <span class="font-bold whitespace-nowrap" [ngClass]="activeColorClass()">{{ visualizerSensitivity() | number:'1.1-1' }}x</span>
+                </div>
+                <input 
+                  type="range" 
+                  min="0.5" 
+                  max="3.0" 
+                  step="0.1"
+                  [ngModel]="visualizerSensitivity()"
+                  (ngModelChange)="visualizerSensitivity.set($event)"
+                  class="w-full h-1 bg-[#121214] appearance-none cursor-pointer"
+                  [ngClass]="activeAccentClass()" />
+
+                <div class="flex justify-between items-center text-[6.5px] text-[#666]">
+                  <span>FFT Decay</span>
+                  <span class="font-bold" [ngClass]="activeColorClass()">{{ visualizerDecay() | number:'1.2-2' }}</span>
+                </div>
+                <input 
+                  type="range" 
+                  min="0.0" 
+                  max="0.95" 
+                  step="0.05"
+                  [ngModel]="visualizerDecay()"
+                  (ngModelChange)="visualizerDecay.set($event)"
+                  class="w-full h-1 bg-[#121214] appearance-none cursor-pointer"
+                  [ngClass]="activeAccentClass()" />
+
+                <!-- Quick palette buttons -->
+                <div class="grid grid-cols-4 gap-0.5 pt-0.5">
+                  @for (c of ['classic', 'amber', 'neon', 'cyan']; track c) {
+                    <button 
+                      (click)="changeColorScheme(c)"
+                      class="text-[5.5px] py-0.5 border uppercase rounded transition-all cursor-pointer font-bold font-mono text-center block"
+                      [ngClass]="{
+                        'bg-[#00FF41]/15 border-[#00FF41] text-[#00FF41]': visualizerColorScheme() === c && c === 'classic',
+                        'bg-[#FFB000]/15 border-[#FFB000] text-[#FFB000]': visualizerColorScheme() === c && c === 'amber',
+                        'bg-[#FF007F]/15 border-[#FF007F] text-[#FF007F]': visualizerColorScheme() === c && c === 'neon',
+                        'bg-[#00F0FF]/15 border-[#00F0FF] text-[#00F0FF]': visualizerColorScheme() === c && c === 'cyan',
+                        'bg-[#050506] border-[#222] text-[#444] hover:text-[#888] hover:border-[#333]': visualizerColorScheme() !== c
+                      }">
+                      {{ c.slice(0, 3) }}
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Consolidated Workspace Row containing Sibling Non-Nested Panels -->
+      <div id="central-sibling-matrix" class="grid grid-cols-1 md:grid-cols-2 gap-2 h-auto lg:h-[300px] flex-shrink-0">
+        
+        <!-- STANDALONE WINDOW: [W-09] PATHWAY ROUTING -->
+        <div id="w-09-routing-panel" class="border border-[#222] bg-[#0A0A0B] rounded flex flex-col h-full overflow-hidden">
+          <!-- Title bar -->
+          <div class="px-2.5 py-1.5 bg-[#121214] border-b border-[#222] flex items-center justify-between text-[9px] font-bold text-[#888] uppercase tracking-wider flex-shrink-0 select-none">
+            <div class="flex items-center gap-1.5 font-mono">
+              <mat-icon style="font-size: 11px; width: 11px; height: 11px; line-height: 11px;" class="text-[#00FF41]">settings_input_component</mat-icon>
+              <span>[W-09] Pathway Routing Matrix</span>
+            </div>
+            <span class="text-[7.5px] text-[#00FF41]/60 font-bold">TAP TO PATCH SIGNAL CHAINS</span>
+          </div>
+
+          <div class="p-2 flex-grow overflow-y-auto space-y-2.5 bg-[#050506]/40 text-[9px] font-mono leading-relaxed">
+            
+            <!-- Sources to chain routing table (Input Buses) -->
+            <div class="space-y-2">
+              <div class="text-[7.5px] font-extrabold text-[#555] uppercase tracking-widest border-b border-[#222]/30 pb-1 font-mono">
+                INPUT SOURCES BUSES ASSIGNMENT
+              </div>
+
+              <div class="space-y-1.5">
+                <!-- Source Row: chrome -->
+                <div 
+                  class="flex flex-col sm:flex-row sm:items-center justify-between bg-[#121214]/60 border border-[#1A1A1C] p-2 rounded gap-1.5 hover:bg-[#121214] transition-colors font-mono">
+                  <div class="flex items-center gap-1.5 relative group cursor-help">
+                    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="activeSources()['pid-8422'] ? 'bg-[#00FF41] animate-pulse' : 'bg-[#333]'"></span>
+                    <span class="font-bold text-[#CCC] text-[9px]">PID 8422 (CHROME)</span>
+
+                    <!-- Source Tooltip -->
+                    <div class="pointer-events-none absolute left-0 top-full mt-2 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#00FF41] text-[#00FF41] p-2 rounded font-mono text-[8px] z-50 w-52 shadow-[0_0_12px_rgba(0,255,65,0.35)] leading-relaxed text-left normal-case">
+                      <div class="font-bold border-b border-[#00FF41]/20 pb-0.5 mb-1 text-[#CCC]">PID 8422 (CHROME)</div>
+                      <div class="text-[#888] mb-1">Captures real-time digital audio stream from open Chrome media sources and background tab process.</div>
+                      <div class="flex justify-between items-center text-[7px] font-bold bg-[#121214] p-1 rounded">
+                        <span class="text-[#555]">STATUS:</span>
+                        <span [ngClass]="activeSources()['pid-8422'] ? 'text-[#00FF41]' : 'text-[#666]'">
+                          {{ activeSources()['pid-8422'] ? 'LIVE STREAMING' : 'STANDBY / OFFLINE' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-4 gap-1 w-full sm:w-auto">
+                    @for (ch of ['direct', 'filter', 'echo', 'distortion']; track ch) {
+                      <button 
+                        type="button"
+                        (click)="updateSourceChain('pid-8422', ch)"
+                        class="px-2 py-1 text-[8px] border font-extrabold uppercase rounded cursor-pointer transition-all font-mono min-h-[28px] min-w-[42px] hover:border-[#00FF41]/60 flex items-center justify-center select-none relative group"
+                        [ngClass]="sourceChainMap()['pid-8422'] === ch ? 
+                          'bg-[#00FF41]/25 border-[#00FF41] text-[#00FF41] shadow-[0_0_6px_rgba(0,255,65,0.25)]' : 
+                          'border-[#222] text-[#555] bg-[#050506] hover:text-[#CCC]'">
+                        {{ ch.slice(0, 3) }}
+
+                        <!-- Chain Tooltip -->
+                        <div class="pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1.5 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#00FF41] text-[#00FF41] p-2 rounded font-mono text-[8px] z-50 w-52 shadow-[0_0_12px_rgba(0,255,65,0.35)] leading-relaxed text-left normal-case font-normal">
+                          <div class="font-bold border-b border-[#00FF41]/20 pb-0.5 mb-1 text-[#CCC]">
+                            ROUTE: {{ ch.toUpperCase() }}
+                          </div>
+                          @if (ch === 'direct') {
+                            <div class="text-[#888] mb-1">Sends the raw, untouched signal directly to patched output terminals.</div>
+                          } @else if (ch === 'filter') {
+                            <div class="text-[#888] mb-1">Routes through the Biquad filter chain to sweep and eliminate unwanted spectrum profiles.</div>
+                          } @else if (ch === 'echo') {
+                            <div class="text-[#888] mb-1">Applies a delay feedback loop, creating deep resonant echoes and audio reflections.</div>
+                          } @else if (ch === 'distortion') {
+                            <div class="text-[#888] mb-1">Overdrives voltage harmonics using non-linear math wave-shaping distortion.</div>
+                          }
+                          <div class="flex justify-between items-center text-[7px] font-bold bg-[#121214] p-1 rounded">
+                            <span class="text-[#555]">CHAIN STATE:</span>
+                            <span class="text-[#00FF41]">
+                              @if (ch === 'direct') {
+                                ACTIVE DIRECT
+                              } @else if (ch === 'filter') {
+                                {{ filterEnabled() ? 'ENABLED (' + filterType().toUpperCase() + ')' : 'FILTER BYPASSED' }}
+                              } @else if (ch === 'echo') {
+                                ECHO ({{ delayTime() }}S / {{ (delayFeedback() * 100).toFixed(0) }}%)
+                              } @else if (ch === 'distortion') {
+                                DIRECT DRIVE {{ distortionAmount() }}X
+                              }
+                            </span>
+                          </div>
+                        </div>
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <!-- Source Row: edge -->
+                <div 
+                  class="flex flex-col sm:flex-row sm:items-center justify-between bg-[#121214]/60 border border-[#1A1A1C] p-2 rounded gap-1.5 hover:bg-[#121214] transition-colors font-mono">
+                  <div class="flex items-center gap-1.5 relative group cursor-help">
+                    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="activeSources()['pid-9901'] ? 'bg-[#00FF41] animate-pulse' : 'bg-[#333]'"></span>
+                    <span class="font-bold text-[#CCC] text-[9px]">PID 9901 (EDGE)</span>
+
+                    <!-- Source Tooltip -->
+                    <div class="pointer-events-none absolute left-0 top-full mt-2 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#00FF41] text-[#00FF41] p-2 rounded font-mono text-[8px] z-50 w-52 shadow-[0_0_12px_rgba(0,255,65,0.35)] leading-relaxed text-left normal-case">
+                      <div class="font-bold border-b border-[#00FF41]/20 pb-0.5 mb-1 text-[#CCC]">PID 9901 (EDGE)</div>
+                      <div class="text-[#888] mb-1">Captures silent background media or WebRTC audio signal from MS Edge engine.</div>
+                      <div class="flex justify-between items-center text-[7px] font-bold bg-[#121214] p-1 rounded">
+                        <span class="text-[#555]">STATUS:</span>
+                        <span [ngClass]="activeSources()['pid-9901'] ? 'text-[#00FF41]' : 'text-[#666]'">
+                          {{ activeSources()['pid-9901'] ? 'LIVE STREAMING' : 'STANDBY / OFFLINE' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-4 gap-1 w-full sm:w-auto">
+                    @for (ch of ['direct', 'filter', 'echo', 'distortion']; track ch) {
+                      <button 
+                        type="button"
+                        (click)="updateSourceChain('pid-9901', ch)"
+                        class="px-2 py-1 text-[8px] border font-extrabold uppercase rounded cursor-pointer transition-all font-mono min-h-[28px] min-w-[42px] hover:border-[#00FF41]/60 flex items-center justify-center select-none relative group"
+                        [ngClass]="sourceChainMap()['pid-9901'] === ch ? 
+                          'bg-[#00FF41]/25 border-[#00FF41] text-[#00FF41] shadow-[0_0_6px_rgba(0,255,65,0.25)]' : 
+                          'border-[#222] text-[#555] bg-[#050506] hover:text-[#CCC]'">
+                        {{ ch.slice(0, 3) }}
+
+                        <!-- Chain Tooltip -->
+                        <div class="pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1.5 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#00FF41] text-[#00FF41] p-2 rounded font-mono text-[8px] z-50 w-52 shadow-[0_0_12px_rgba(0,255,65,0.35)] leading-relaxed text-left normal-case font-normal">
+                          <div class="font-bold border-b border-[#00FF41]/20 pb-0.5 mb-1 text-[#CCC]">
+                            ROUTE: {{ ch.toUpperCase() }}
+                          </div>
+                          @if (ch === 'direct') {
+                            <div class="text-[#888] mb-1">Sends the raw, untouched signal directly to patched output terminals.</div>
+                          } @else if (ch === 'filter') {
+                            <div class="text-[#888] mb-1">Routes through the Biquad filter chain to sweep and eliminate unwanted spectrum profiles.</div>
+                          } @else if (ch === 'echo') {
+                            <div class="text-[#888] mb-1">Applies a delay feedback loop, creating deep resonant echoes and audio reflections.</div>
+                          } @else if (ch === 'distortion') {
+                            <div class="text-[#888] mb-1">Overdrives voltage harmonics using non-linear math wave-shaping distortion.</div>
+                          }
+                          <div class="flex justify-between items-center text-[7px] font-bold bg-[#121214] p-1 rounded">
+                            <span class="text-[#555]">CHAIN STATE:</span>
+                            <span class="text-[#00FF41]">
+                              @if (ch === 'direct') {
+                                ACTIVE DIRECT
+                              } @else if (ch === 'filter') {
+                                {{ filterEnabled() ? 'ENABLED (' + filterType().toUpperCase() + ')' : 'FILTER BYPASSED' }}
+                              } @else if (ch === 'echo') {
+                                ECHO ({{ delayTime() }}S / {{ (delayFeedback() * 100).toFixed(0) }}%)
+                              } @else if (ch === 'distortion') {
+                                DIRECT DRIVE {{ distortionAmount() }}X
+                              }
+                            </span>
+                          </div>
+                        </div>
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <!-- Source Row: alarm -->
+                <div 
+                  class="flex flex-col sm:flex-row sm:items-center justify-between bg-[#121214]/60 border border-[#1A1A1C] p-2 rounded gap-1.5 hover:bg-[#121214] transition-colors font-mono">
+                  <div class="flex items-center gap-1.5 relative group cursor-help">
+                    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="activeSources()['pid-4401'] ? 'bg-[#00FF41] animate-pulse' : 'bg-[#333]'"></span>
+                    <span class="font-bold text-[#CCC] text-[9px]">PID 4401 (ALARM)</span>
+
+                    <!-- Source Tooltip -->
+                    <div class="pointer-events-none absolute left-0 top-full mt-2 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#00FF41] text-[#00FF41] p-2 rounded font-mono text-[8px] z-50 w-52 shadow-[0_0_12px_rgba(0,255,65,0.35)] leading-relaxed text-left normal-case">
+                      <div class="font-bold border-b border-[#00FF41]/20 pb-0.5 mb-1 text-[#CCC]">PID 4401 (ALARM)</div>
+                      <div class="text-[#888] mb-1">Pipes emergency WebRTC sirens and critical local alarm daemon triggers into matrix.</div>
+                      <div class="flex justify-between items-center text-[7px] font-bold bg-[#121214] p-1 rounded">
+                        <span class="text-[#555]">STATUS:</span>
+                        <span [ngClass]="activeSources()['pid-4401'] ? 'text-[#FF4141] font-bold' : 'text-[#666]'">
+                          {{ activeSources()['pid-4401'] ? 'BURST ACTIVE' : 'STANDBY' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-4 gap-1 w-full sm:w-auto">
+                    @for (ch of ['direct', 'filter', 'echo', 'distortion']; track ch) {
+                      <button 
+                        type="button"
+                        (click)="updateSourceChain('pid-4401', ch)"
+                        class="px-2 py-1 text-[8px] border font-extrabold uppercase rounded cursor-pointer transition-all font-mono min-h-[28px] min-w-[42px] hover:border-[#00FF41]/60 flex items-center justify-center select-none relative group"
+                        [ngClass]="sourceChainMap()['pid-4401'] === ch ? 
+                          'bg-[#00FF41]/25 border-[#00FF41] text-[#00FF41] shadow-[0_0_6px_rgba(0,255,65,0.25)]' : 
+                          'border-[#222] text-[#555] bg-[#050506] hover:text-[#CCC]'">
+                        {{ ch.slice(0, 3) }}
+
+                        <!-- Chain Tooltip -->
+                        <div class="pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1.5 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#00FF41] text-[#00FF41] p-2 rounded font-mono text-[8px] z-50 w-52 shadow-[0_0_12px_rgba(0,255,65,0.35)] leading-relaxed text-left normal-case font-normal">
+                          <div class="font-bold border-b border-[#00FF41]/20 pb-0.5 mb-1 text-[#CCC]">
+                            ROUTE: {{ ch.toUpperCase() }}
+                          </div>
+                          @if (ch === 'direct') {
+                            <div class="text-[#888] mb-1">Sends the raw, untouched signal directly to patched output terminals.</div>
+                          } @else if (ch === 'filter') {
+                            <div class="text-[#888] mb-1">Routes through the Biquad filter chain to sweep and eliminate unwanted spectrum profiles.</div>
+                          } @else if (ch === 'echo') {
+                            <div class="text-[#888] mb-1">Applies a delay feedback loop, creating deep resonant echoes and audio reflections.</div>
+                          } @else if (ch === 'distortion') {
+                            <div class="text-[#888] mb-1">Overdrives voltage harmonics using non-linear math wave-shaping distortion.</div>
+                          }
+                          <div class="flex justify-between items-center text-[7px] font-bold bg-[#121214] p-1 rounded">
+                            <span class="text-[#555]">CHAIN STATE:</span>
+                            <span class="text-[#00FF41]">
+                              @if (ch === 'direct') {
+                                ACTIVE DIRECT
+                              } @else if (ch === 'filter') {
+                                {{ filterEnabled() ? 'ENABLED (' + filterType().toUpperCase() + ')' : 'FILTER BYPASSED' }}
+                              } @else if (ch === 'echo') {
+                                ECHO ({{ delayTime() }}S / {{ (delayFeedback() * 100).toFixed(0) }}%)
+                              } @else if (ch === 'distortion') {
+                                DIRECT DRIVE {{ distortionAmount() }}X
+                              }
+                            </span>
+                          </div>
+                        </div>
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <!-- Source Row: osc -->
+                <div 
+                  class="flex flex-col sm:flex-row sm:items-center justify-between bg-[#121214]/60 border border-[#1A1A1C] p-2 rounded gap-1.5 hover:bg-[#121214] transition-colors font-mono">
+                  <div class="flex items-center gap-1.5 relative group cursor-help">
+                    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="activeSources()['osc'] ? 'bg-[#00FF41] animate-pulse' : 'bg-[#333]'"></span>
+                    <span class="font-bold text-[#CCC] text-[9px]">TUNER OSC</span>
+
+                    <!-- Source Tooltip -->
+                    <div class="pointer-events-none absolute left-0 top-full mt-2 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#00FF41] text-[#00FF41] p-2 rounded font-mono text-[8px] z-50 w-52 shadow-[0_0_12px_rgba(0,255,65,0.35)] leading-relaxed text-left normal-case">
+                      <div class="font-bold border-b border-[#00FF41]/20 pb-0.5 mb-1 text-[#CCC]">TUNER OSCILLATOR</div>
+                      <div class="text-[#888] mb-1">Direct wave synthesizer. Generates pure custom reference oscillations mapped to fine sweeper.</div>
+                      <div class="flex justify-between items-center text-[7px] font-bold bg-[#121214] p-1 rounded">
+                        <span class="text-[#555]">STATUS:</span>
+                        <span [ngClass]="activeSources()['osc'] ? 'text-[#00FF41]' : 'text-[#666]'">
+                          {{ activeSources()['osc'] ? ('LIVE (' + manualSynthFreq() + ' HZ)') : 'IDLE / OFFLINE' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-4 gap-1 w-full sm:w-auto">
+                    @for (ch of ['direct', 'filter', 'echo', 'distortion']; track ch) {
+                      <button 
+                        type="button"
+                        (click)="updateSourceChain('osc', ch)"
+                        class="px-2 py-1 text-[8px] border font-extrabold uppercase rounded cursor-pointer transition-all font-mono min-h-[28px] min-w-[42px] hover:border-[#00FF41]/60 flex items-center justify-center select-none relative group"
+                        [ngClass]="sourceChainMap()['osc'] === ch ? 
+                          'bg-[#00FF41]/25 border-[#00FF41] text-[#00FF41] shadow-[0_0_6px_rgba(0,255,65,0.25)]' : 
+                          'border-[#222] text-[#555] bg-[#050506] hover:text-[#CCC]'">
+                        {{ ch.slice(0, 3) }}
+
+                        <!-- Chain Tooltip -->
+                        <div class="pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1.5 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#00FF41] text-[#00FF41] p-2 rounded font-mono text-[8px] z-50 w-52 shadow-[0_0_12px_rgba(0,255,65,0.35)] leading-relaxed text-left normal-case font-normal">
+                          <div class="font-bold border-b border-[#00FF41]/20 pb-0.5 mb-1 text-[#CCC]">
+                            ROUTE: {{ ch.toUpperCase() }}
+                          </div>
+                          @if (ch === 'direct') {
+                            <div class="text-[#888] mb-1">Sends the raw, untouched signal directly to patched output terminals.</div>
+                          } @else if (ch === 'filter') {
+                            <div class="text-[#888] mb-1">Routes through the Biquad filter chain to sweep and eliminate unwanted spectrum profiles.</div>
+                          } @else if (ch === 'echo') {
+                            <div class="text-[#888] mb-1">Applies a delay feedback loop, creating deep resonant echoes and audio reflections.</div>
+                          } @else if (ch === 'distortion') {
+                            <div class="text-[#888] mb-1">Overdrives voltage harmonics using non-linear math wave-shaping distortion.</div>
+                          }
+                          <div class="flex justify-between items-center text-[7px] font-bold bg-[#121214] p-1 rounded">
+                            <span class="text-[#555]">CHAIN STATE:</span>
+                            <span class="text-[#00FF41]">
+                              @if (ch === 'direct') {
+                                ACTIVE DIRECT
+                              } @else if (ch === 'filter') {
+                                {{ filterEnabled() ? 'ENABLED (' + filterType().toUpperCase() + ')' : 'FILTER BYPASSED' }}
+                              } @else if (ch === 'echo') {
+                                ECHO ({{ delayTime() }}S / {{ (delayFeedback() * 100).toFixed(0) }}%)
+                              } @else if (ch === 'distortion') {
+                                DIRECT DRIVE {{ distortionAmount() }}X
+                              }
+                            </span>
+                          </div>
+                        </div>
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <!-- Source Row: mic -->
+                <div 
+                  class="flex flex-col sm:flex-row sm:items-center justify-between bg-[#130E0A]/60 border border-[#231A12] p-2 rounded gap-1.5 hover:bg-[#1C140F] transition-colors font-mono">
+                  <div class="flex items-center gap-1.5 relative group cursor-help">
+                    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="activeSources()['mic'] ? 'bg-[#FF7F00] animate-pulse' : 'bg-[#333]'"></span>
+                    <span class="font-bold text-[#FF7F00] text-[9px]">MICROPHONE</span>
+
+                    <!-- Source Tooltip (Orange themed) -->
+                    <div class="pointer-events-none absolute left-0 top-full mt-2 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#FF7F00] text-[#FF7F00] p-2 rounded font-mono text-[8px] z-50 w-52 shadow-[0_0_12px_rgba(255,127,0,0.35)] leading-relaxed text-left normal-case">
+                      <div class="font-bold border-b border-[#FF7F00]/20 pb-0.5 mb-1 text-[#FF7F00]">MICROPHONE FEED</div>
+                      <div class="text-[#888] mb-1">Captures real-time physical acoustic environment signals using WebRTC hardware capture node.</div>
+                      <div class="flex justify-between items-center text-[7px] font-bold bg-[#121214] p-1 rounded">
+                        <span class="text-[#555]">STATUS:</span>
+                        <span [ngClass]="activeSources()['mic'] ? 'text-[#FF7F00]' : 'text-[#666]'">
+                          {{ activeSources()['mic'] ? 'ACQUIRING COUPLING' : 'DISABLED / INACTIVE' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-4 gap-1 w-full sm:w-auto">
+                    @for (ch of ['direct', 'filter', 'echo', 'distortion']; track ch) {
+                      <button 
+                        type="button"
+                        (click)="updateSourceChain('mic', ch)"
+                        class="px-2 py-1 text-[8px] border font-extrabold uppercase rounded cursor-pointer transition-all font-mono min-h-[28px] min-w-[42px] hover:border-[#FF7F00]/60 flex items-center justify-center select-none relative group"
+                        [ngClass]="sourceChainMap()['mic'] === ch ? 
+                          'bg-[#FF7F00]/25 border-[#FF7F00] text-[#FF7F00] shadow-[0_0_6px_rgba(255,127,0,0.25)]' : 
+                          'border-[#222] text-[#555] bg-[#050506] hover:text-[#CCC]'">
+                        {{ ch.slice(0, 3) }}
+
+                        <!-- Chain Tooltip (Orange themed) -->
+                        <div class="pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1.5 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#FF7F00] text-[#FF7F00] p-2 rounded font-mono text-[8px] z-50 w-52 shadow-[0_0_12px_rgba(255,127,0,0.35)] leading-relaxed text-left normal-case font-normal">
+                          <div class="font-bold border-b border-[#FF7F00]/20 pb-0.5 mb-1 text-[#CCC]">
+                            ROUTE: {{ ch.toUpperCase() }}
+                          </div>
+                          @if (ch === 'direct') {
+                            <div class="text-[#888] mb-1">Sends the raw, untouched signal directly to patched output terminals.</div>
+                          } @else if (ch === 'filter') {
+                            <div class="text-[#888] mb-1">Routes through the Biquad filter chain to sweep and eliminate unwanted spectrum profiles.</div>
+                          } @else if (ch === 'echo') {
+                            <div class="text-[#888] mb-1">Applies a delay feedback loop, creating deep resonant echoes and audio reflections.</div>
+                          } @else if (ch === 'distortion') {
+                            <div class="text-[#888] mb-1">Overdrives voltage harmonics using non-linear math wave-shaping distortion.</div>
+                          }
+                          <div class="flex justify-between items-center text-[7px] font-bold bg-[#121214] p-1 rounded">
+                            <span class="text-[#555]">CHAIN STATE:</span>
+                            <span class="text-[#FF7F00]">
+                              @if (ch === 'direct') {
+                                ACTIVE DIRECT
+                              } @else if (ch === 'filter') {
+                                {{ filterEnabled() ? 'ENABLED (' + filterType().toUpperCase() + ')' : 'FILTER BYPASSED' }}
+                              } @else if (ch === 'echo') {
+                                ECHO ({{ delayTime() }}S / {{ (delayFeedback() * 100).toFixed(0) }}%)
+                              } @else if (ch === 'distortion') {
+                                DIRECT DRIVE {{ distortionAmount() }}X
+                              }
+                            </span>
+                          </div>
+                        </div>
+                      </button>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Out socket patching matrix -->
+            <div class="pt-2 border-t border-[#222]/30 space-y-1.5 font-mono">
+              <div class="text-[7.5px] font-extrabold text-[#555] uppercase tracking-widest border-b border-[#222]/30 pb-0.5">
+                OUTPUT PATCH-BAY / TERMINAL GRID
+              </div>
+
+              <div class="space-y-1 bg-black/30 p-1.5 rounded">
+                <!-- Column Labels -->
+                <div class="grid grid-cols-5 text-[6.5px] font-extrabold text-[#444] text-center mb-1 select-none">
+                  <div class="text-left font-bold text-[#555]">CHAIN BUS</div>
+                  
+                  <!-- Speaker Header -->
+                  <div class="relative group cursor-help flex justify-center text-center">
+                    🔊 SPK
+                    <!-- Speaker Tooltip -->
+                    <div class="pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#00FF41] text-[#00FF41] p-2 rounded font-mono text-[8px] z-50 w-48 shadow-[0_0_12px_rgba(0,255,65,0.35)] leading-relaxed text-left normal-case font-normal">
+                      <div class="font-bold border-b border-[#00FF41]/20 pb-0.5 mb-1 text-[#CCC]">🔊 MASTER SPEAKER</div>
+                      <div class="text-[#888] mb-1">Routes patched signal outputs directly to the local hardware speaker master monitor.</div>
+                      <div class="flex justify-between items-center text-[7px] font-bold bg-[#121214] p-1 rounded">
+                        <span class="text-[#555]">MONITOR:</span>
+                        <span [ngClass]="muteSynth() ? 'text-[#FF4141]' : 'text-[#00FF41]'">
+                          {{ muteSynth() ? 'MUTED' : 'UNMUTED / ONLINE' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Scope Header -->
+                  <div class="relative group cursor-help flex justify-center text-center">
+                    📈 SCP
+                    <!-- Scope Tooltip -->
+                    <div class="pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#00FF41] text-[#00FF41] p-2 rounded font-mono text-[8px] z-50 w-48 shadow-[0_0_12px_rgba(0,255,65,0.35)] leading-relaxed text-left normal-case font-normal">
+                      <div class="font-bold border-b border-[#00FF41]/20 pb-0.5 mb-1 text-[#CCC]">📈 SPECTRUM SCOPE</div>
+                      <div class="text-[#888] mb-1">Couples channels directly into the High-Definition Real-Time Frequency and Waveform Viewport.</div>
+                      <div class="flex justify-between items-center text-[7px] font-bold bg-[#121214] p-1 rounded">
+                        <span class="text-[#555]">COUPLING:</span>
+                        <span class="text-[#00FF41]">ACTIVE COUPLING</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Recorder Header -->
+                  <div class="relative group cursor-help flex justify-center text-center">
+                    ⏺ REC
+                    <!-- Recorder Tooltip -->
+                    <div class="pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#00FF41] text-[#00FF41] p-2 rounded font-mono text-[8px] z-50 w-48 shadow-[0_0_12px_rgba(0,255,65,0.35)] leading-relaxed text-left normal-case font-normal">
+                      <div class="font-bold border-b border-[#00FF41]/20 pb-0.5 mb-1 text-[#CCC]">⏺ STREAM RECORDER</div>
+                      <div class="text-[#888] mb-1">Feeds audio streams into the high-precision WAV recording system for archival storage.</div>
+                      <div class="flex justify-between items-center text-[7px] font-bold bg-[#121214] p-1 rounded">
+                        <span class="text-[#555]">REC DECK:</span>
+                        <span [ngClass]="isRecording() ? 'text-[#FF4141] font-bold animate-pulse' : 'text-[#888]'">
+                          {{ isRecording() ? 'RECORDING STREAM' : 'STANDBY' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Decoder Header -->
+                  <div class="relative group cursor-help flex justify-center text-center">
+                    🔒 DEC
+                    <!-- Decoder Tooltip -->
+                    <div class="pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#00FF41] text-[#00FF41] p-2 rounded font-mono text-[8px] z-50 w-48 shadow-[0_0_12px_rgba(0,255,65,0.35)] leading-relaxed text-left normal-case font-normal">
+                      <div class="font-bold border-b border-[#00FF41]/20 pb-0.5 mb-1 text-[#CCC]">🔒 CRYPTO DECODER</div>
+                      <div class="text-[#888] mb-1">Transmits patched bitstream logs directly into the AES Decryption Gateway Console.</div>
+                      <div class="flex justify-between items-center text-[7px] font-bold bg-[#121214] p-1 rounded">
+                        <span class="text-[#555]">AES PORT:</span>
+                        <span class="text-[#00F0FF]">LIVE PASS_THRU</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                @for (chain of ['direct', 'filter', 'echo', 'distortion']; track chain) {
+                  <div class="grid grid-cols-5 items-center text-center py-1 border-b border-[#121214] last:border-b-0">
+                    <div class="text-left font-extrabold text-[#999] uppercase select-none text-[8px] truncate relative group cursor-help">
+                      {{ chain === 'distortion' ? 'SATURAT' : chain.toUpperCase() }}
+
+                      <!-- Bus Tooltip -->
+                      <div class="pointer-events-none absolute bottom-full left-0 mb-1.5 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#00FF41] text-[#00FF41] p-2 rounded font-mono text-[8px] z-50 w-48 shadow-[0_0_12px_rgba(0,255,65,0.35)] leading-relaxed text-left normal-case font-normal">
+                        <div class="font-bold border-b border-[#00FF41]/20 pb-0.5 mb-1 text-[#CCC]">
+                          {{ chain === 'distortion' ? 'SATURATION BUS' : chain.toUpperCase() + ' BUS' }}
+                        </div>
+                        @if (chain === 'direct') {
+                          <p class="text-[#888] mb-1">Bypasses filters to distribute the un-altered direct signal.</p>
+                        } @else if (chain === 'filter') {
+                          <p class="text-[#888] mb-1">Carries the band-limited filter signal for target scanning.</p>
+                        } @else if (chain === 'echo') {
+                          <p class="text-[#888] mb-1">Carries delayed feedback echo loops for acoustic mapping.</p>
+                        } @else if (chain === 'distortion') {
+                          <p class="text-[#888] mb-1">Carries wave-shaped non-linear booster output saturation.</p>
+                        }
+                        <div class="flex justify-between items-center text-[7px] font-bold bg-[#121214] p-1 rounded">
+                          <span class="text-[#555]">BUS COMP:</span>
+                          <span class="text-[#00FF41]">ACTIVE</span>
+                        </div>
+                      </div>
+                    </div>
+                    @for (dest of ['speaker', 'scope', 'recorder', 'decoder']; track dest) {
+                      <div class="flex justify-center select-none font-mono">
+                        <button 
+                          type="button"
+                          (click)="toggleDestMapping(chain, dest)"
+                          class="w-6.5 h-6.5 sm:w-7.5 sm:h-7.5 rounded border flex items-center justify-center transition-all cursor-pointer relative focus:outline-none group"
+                          [ngClass]="isDestMapped(chain, dest) ? 
+                            'bg-[#00FF41]/25 border-[#00FF41] shadow-[0_0_6px_rgba(0,255,65,0.45)] text-[#00FF41]' : 
+                            'bg-[#121214] border-[#222] hover:border-[#444] text-[#444]'"
+                          [title]="'Patch ' + chain.toUpperCase() + ' to ' + dest.toUpperCase()">
+                          <span class="w-2 h-2 rounded-full" [ngClass]="isDestMapped(chain, dest) ? 'bg-[#00FF41]' : 'bg-[#222]'"></span>
+
+                          <!-- Cross-point Tooltip -->
+                          <div class="pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#00FF41] text-[#00FF41] p-2 rounded font-mono text-[8px] z-50 w-48 shadow-[0_0_12px_rgba(0,255,65,0.35)] leading-relaxed text-left normal-case font-normal">
+                            <div class="font-bold border-b border-[#00FF41]/20 pb-0.5 mb-1 text-[#CCC]">
+                              PATCH MATRIX TERMINAL
+                            </div>
+                            <div class="text-[#888] mb-1">
+                              Connects processing bus <span class="text-[#00FF41] font-bold">{{ chain === 'distortion' ? 'SATURAT' : chain.toUpperCase() }}</span> with <span class="text-[#00FF41] font-bold">{{ dest === 'speaker' ? 'SPEAKER' : (dest === 'scope' ? 'SCOPE' : (dest === 'recorder' ? 'RECORDER' : 'DECODER')) }}</span> terminal.
+                            </div>
+                            <div class="flex justify-between items-center text-[7px] font-bold bg-[#121214] p-1 rounded">
+                              <span class="text-[#555]">PATCH STATUS:</span>
+                              <span [ngClass]="isDestMapped(chain, dest) ? 'text-[#00FF41]' : 'text-[#666]'">
+                                {{ isDestMapped(chain, dest) ? 'PATCHED / CONNECTED' : 'OPEN CIRCUIT' }}
+                              </span>
+                            </div>
+                          </div>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Extra parameter controls for the chain nodes -->
+            <div class="border-t border-[#222]/30 pt-2 flex flex-col gap-2 bg-black/20 p-2 rounded">
+              <!-- echo controls -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[8px]">
+                <div class="space-y-0.5 font-mono relative group">
+                  <div class="flex items-center justify-between text-[7px] text-[#888] font-mono leading-none font-bold">
+                    <span>ECHO DELAY:</span>
+                    <span class="text-[#00FF41] font-bold">{{ delayTime() }}s</span>
+                  </div>
+                  <input 
+                    type="range"
+                    min="0.1"
+                    max="1.5"
+                    step="0.05"
+                    [value]="delayTime()"
+                    (input)="delayTime.set(getSliderValue($event))"
+                    class="w-full h-1 bg-[#222] border-0 outline-none appearance-none cursor-pointer accent-[#00FF41]" />
+
+                  <!-- Echo Delay Tooltip -->
+                  <div class="pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#00FF41] text-[#00FF41] p-2 rounded font-mono text-[8px] z-50 w-48 shadow-[0_0_12px_rgba(0,255,65,0.35)] leading-relaxed text-left normal-case font-normal">
+                    <div class="font-bold border-b border-[#00FF41]/20 pb-0.5 mb-1 text-[#CCC]">ECHO DELAY INTERVAL</div>
+                    <div class="text-[#888] mb-1">Adjusts physical audio buffer storage duration in seconds before emitting the feedback reflections.</div>
+                  </div>
+                </div>
+                <div class="space-y-0.5 font-mono relative group">
+                  <div class="flex items-center justify-between text-[7px] text-[#888] font-mono leading-none font-bold">
+                    <span>FEEDBACK:</span>
+                    <span class="text-[#00FF41] font-bold">{{ (delayFeedback() * 100).toFixed(0) }}%</span>
+                  </div>
+                  <input 
+                    type="range"
+                    min="0.0"
+                    max="0.85"
+                    step="0.05"
+                    [value]="delayFeedback()"
+                    (input)="delayFeedback.set(getSliderValue($event))"
+                    class="w-full h-1 bg-[#222] border-0 outline-none appearance-none cursor-pointer accent-[#00FF41]" />
+
+                  <!-- Feedback Tooltip -->
+                  <div class="pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#00FF41] text-[#00FF41] p-2 rounded font-mono text-[8px] z-50 w-48 shadow-[0_0_12px_rgba(0,255,65,0.35)] leading-relaxed text-left normal-case font-normal">
+                    <div class="font-bold border-b border-[#00FF41]/20 pb-0.5 mb-1 text-[#CCC]">ECHO FEEDBACK DECAY</div>
+                    <div class="text-[#888] mb-1">Sets the multiplier of signal fed back into the delay stream. Higher values yield longer decay patterns.</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- saturation controls -->
+              <div class="space-y-0.5 text-[8px] font-mono relative group">
+                <div class="flex items-center justify-between text-[7px] text-[#888] font-mono leading-none font-bold">
+                  <span>SATURATION OVERDRIVE:</span>
+                  <span class="text-[#00FF41] font-bold">{{ distortionAmount() }}x Booster</span>
+                </div>
+                <input 
+                  type="range"
+                  min="10"
+                  max="150"
+                  step="5"
+                  [value]="distortionAmount()"
+                  (input)="distortionAmount.set(getSliderValue($event))"
+                  class="w-full h-1 bg-[#222] border-0 outline-none appearance-none cursor-pointer accent-[#00FF41]" />
+
+                <!-- Saturation Tooltip -->
+                <div class="pointer-events-none absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-[#0A0A0B]/95 border border-[#00FF41] text-[#00FF41] p-2 rounded font-mono text-[8px] z-50 w-48 shadow-[0_0_12px_rgba(0,255,65,0.35)] leading-relaxed text-left normal-case font-normal">
+                  <div class="font-bold border-b border-[#00FF41]/20 pb-0.5 mb-1 text-[#CCC]">SATURATION GAIN BOOSTER</div>
+                  <div class="text-[#888] mb-1">Amplifies signals beyond normal clipping ceilings, adding harmonic non-linear audio warm fuzz.</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- STANDALONE WINDOW: [W-05] DECRYPTED PAYLOAD -->
+        <div id="w-05-payload-panel" class="border border-[#222] bg-[#0A0A0B] rounded flex flex-col h-full overflow-hidden">
+          <!-- Title bar -->
+          <div class="px-2.5 py-1.5 bg-[#121214] border-b border-[#222] flex items-center justify-between text-[9px] font-bold text-[#888] uppercase tracking-wider flex-shrink-0 select-none">
+            <div class="flex items-center gap-1.5 font-mono">
+              <mat-icon style="font-size: 11px; width: 11px; height: 11px; line-height: 11px;" class="text-[#00F0FF]">lock_open</mat-icon>
+              <span>[W-05] Decrypted Bitstream Console</span>
+            </div>
+            <span class="text-[7px] text-[#00F0FF]/60 font-bold animate-pulse">PARSING_LIVE_BITS ●</span>
+          </div>
+
+          <div class="p-2.5 flex-grow overflow-y-auto font-mono text-[9px] bg-black/95 text-[#00F0FF] space-y-1 flex flex-col leading-relaxed justify-end select-text">
+            <pre class="break-words whitespace-pre-wrap font-mono uppercase bg-transparent p-0 border-0 m-0 leading-normal overflow-y-auto flex-grow max-h-[180px] text-[8px] text-[#00F0FF]/90 scrollbar-thin scrollbar-thumb-cyan-900">{{ decryptedPayload() }}</pre>
+            
+            <div class="border-t border-[#00F0FF]/15 pt-1.5 text-[7px] text-[#00F0FF]/50 flex justify-between uppercase font-mono tracking-wider">
+              <span>PACKET STATUS: DECODING AES_PASSTHROUGH</span>
+              <span>DECODED_OK_LINK ●</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- RIGHT SIDEBAR SECTION (col-span-3) -->
+    <aside class="col-span-3 flex flex-col gap-1 min-h-0 overflow-y-auto pl-0.5">
+      
+      <!-- WINDOW 6: Multichannel Recording Station -->
+      <div class="border border-[#222] bg-[#0A0A0B] flex flex-col rounded overflow-hidden">
+        <div class="px-2 py-1 bg-[#121214] border-b border-[#222] flex items-center justify-between text-[9px] font-bold text-[#888] uppercase tracking-wider">
+          <div class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#FF4141]" [ngClass]="isRecording() ? 'animate-ping' : ''"></span>
+            <span>[W-06] Recording Chamber</span>
+          </div>
+          @if (isRecording()) {
+            <span class="text-[7.5px] px-1 bg-[#FF4141]/20 border border-[#FF4141] text-[#FF4141] rounded font-mono font-bold animate-pulse">
+              ● REC_LIVE
+            </span>
+          } @else {
+            <span class="text-[7.5px] px-1 bg-[#222] text-[#555] rounded font-mono font-bold">STANDBY</span>
+          }
+        </div>
+
+        <div class="p-2.5 space-y-2 bg-[#050506]/40 text-[9px] font-mono">
+          
+          <!-- ULTRA-CLEAR CURRENT RECORDING TIME DISPLAY -->
+          <div class="bg-[#121214] border border-[#222] p-2 rounded flex justify-between items-center relative overflow-hidden">
+            <div>
+              <span class="text-[7px] text-[#444] font-bold block uppercase tracking-wider">CURRENT DURATION:</span>
+              <span class="text-[11.5px] font-bold" [ngClass]="isRecording() ? 'text-[#FF4141] animate-pulse' : 'text-[#888]'">
+                {{ recordingDurationString() }}
+              </span>
+            </div>
+            <div class="flex flex-col items-end">
+              <span class="text-[6.5px] text-[#444] font-bold block uppercase">SPEED MULTIPLIER:</span>
+              <div class="flex items-center gap-1 mt-0.5">
+                @for (m of [1, 10, 60]; track m) {
+                  <button 
+                    (click)="recordingSpeedMultiplier.set(m)"
+                    class="text-[7px] font-bold px-1 rounded border transition-all cursor-pointer"
+                    [ngClass]="recordingSpeedMultiplier() === m ? 'bg-[#00FF41] text-black border-[#00FF41]' : 'bg-[#0A0A0B] border-[#222] text-[#555] hover:text-[#888]'">
+                    {{ m }}x
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- SOURCE SELECTION INTERFACES -->
+          <div class="bg-[#0A0A0B]/80 border border-[#1A1A1C] p-2 rounded">
+            <span class="text-[7.5px] text-[#444] font-bold uppercase tracking-wider block mb-1">RECORDING FEED TARGET CHANNELS:</span>
+            <div class="grid grid-cols-3 gap-1">
+              <button 
+                (click)="recordingSource.set('inside')"
+                class="py-0.5 text-[7px] uppercase rounded border font-bold cursor-pointer transition-all"
+                [ngClass]="recordingSource() === 'inside' ? 'bg-[#00FF41]/10 border-[#00FF41] text-[#00FF41]' : 'bg-[#050506] border-[#222] text-[#444] hover:text-[#888]'">
+                Inside
+              </button>
+              <button 
+                (click)="recordingSource.set('outside')"
+                class="py-0.5 text-[7px] uppercase rounded border font-bold cursor-pointer transition-all"
+                [ngClass]="recordingSource() === 'outside' ? 'bg-[#FF7F00]/10 border-[#FF7F00] text-[#FF7F00]' : 'bg-[#050506] border-[#222] text-[#444] hover:text-[#888]'">
+                Outside
+              </button>
+              <button 
+                (click)="recordingSource.set('hybrid')"
+                class="py-0.5 text-[7px] uppercase rounded border font-bold cursor-pointer transition-all"
+                [ngClass]="recordingSource() === 'hybrid' ? 'bg-[#00F0FF]/15 border-[#00F0FF] text-[#00F0FF]' : 'bg-[#050506] border-[#222] text-[#444] hover:text-[#888]'">
+                Hybrid
+              </button>
+            </div>
+            
+            <p class="text-[6.2px] text-[#444] font-mono mt-1.5 leading-normal">
+              @if (recordingSource() === 'inside') {
+                * Loops digital signals generated from active browser tabs.
+              } @else if (recordingSource() === 'outside') {
+                * Gathers environment acoustic feedback via hardware microphone.
+              } @else {
+                * Merges mechanical microphone waves with direct browser synthesizer loops.
+              }
+            </p>
+          </div>
+
+          <!-- TRIGGER BUTTONS -->
+          <div class="flex gap-1.5 pt-0.5">
+            @if (!isRecording()) {
+              <button 
+                (click)="startRecording()"
+                class="flex-grow py-1.5 bg-[#00FF41] hover:bg-[#00CC33] text-black font-extrabold uppercase rounded text-[8px] tracking-widest transition-all cursor-pointer flex items-center justify-center gap-1 shadow-[0_0_8px_rgba(0,255,65,0.15)] border-0">
+                <mat-icon class="text-[11px] h-3 w-3 inline flex items-center justify-center font-bold">fiber_manual_record</mat-icon>
+                START TELEMETRY RECO
+              </button>
+            } @else {
+              <button 
+                (click)="stopRecording()"
+                class="flex-grow py-1.5 bg-[#FF4141] hover:bg-[#CC0000] text-black font-extrabold uppercase rounded text-[8px] tracking-widest transition-all cursor-pointer flex items-center justify-center gap-1 shadow-[0_0_8px_rgba(255,65,65,0.15)] animate-pulse border-0">
+                <mat-icon class="text-[11px] h-3 w-3 inline flex items-center justify-center font-bold">stop</mat-icon>
+                STOP & COMPILE WAV CLIPS
+              </button>
+            }
+          </div>
+
+        </div>
+      </div>
+
+      <!-- WINDOW 7: Captured Wave Registry Archives (File Manager with duration.mins) -->
+      <div class="border border-[#222] bg-[#0A0A0B] flex flex-col rounded overflow-hidden flex-1 min-h-[170px]">
+        <div class="px-2 py-1 bg-[#121214] border-b border-[#222] flex items-center justify-between text-[9px] font-bold text-[#888] uppercase tracking-wider">
+          <div class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 bg-[#00FF41] rounded-full"></span>
+            <span>[W-07] Captured Clips Archive</span>
+          </div>
+          <span class="text-[7.5px] px-1 bg-[#00FF41]/10 border border-[#00FF41]/30 text-[#00FF41] rounded font-mono font-bold">
+            {{ recordedFiles().length }} INDEXED
+          </span>
+        </div>
+
+        <div class="p-2 space-y-2 flex-grow overflow-y-auto flex flex-col min-h-0 bg-[#050506]/30">
+          
+          <!-- SEED CLIPS DEMO INJECT BUTTON (Allows generating longer and more recordings easily) -->
+          <div class="flex-shrink-0">
+            <button 
+              (click)="generateDemoClips()"
+              class="w-full py-1 text-center bg-[#FF7F00]/10 hover:bg-[#FF7F00]/20 border border-[#FF7F00]/30 hover:border-[#FF7F00] text-[#FF7F00] font-bold text-[7.5px] rounded tracking-wide font-mono uppercase transition-all duration-150 cursor-pointer flex items-center justify-center gap-1">
+              <mat-icon class="text-[9px] h-3 w-3 flex justify-center items-center font-bold">playlist_add</mat-icon>
+              SEED HIGH-TIME DEMOS (1.5m - 30.0m RECS)
+            </button>
+          </div>
+
+          <div class="space-y-1.5 overflow-y-auto flex-1 pr-1.5 min-h-[80px]">
+            @for (file of recordedFiles(); track file.id) {
+              <div 
+                class="p-1.5 bg-[#121214]/70 border rounded transition-all duration-100 flex flex-col gap-1 shadow-sm"
+                [ngClass]="currentlyPlayingId() === file.id ? 'border-[#00FF41] bg-[#00FF41]/5 shadow-[0_0_6px_rgba(0,255,65,0.05)]' : 'border-[#1C1C1F]'">
+                
+                <div class="flex items-start justify-between gap-1.5 font-mono">
+                  <div class="flex items-center gap-1 overflow-hidden">
+                    <mat-icon 
+                      class="text-[12px] h-3 w-3 flex items-center justify-center text-[#FF7F00]" 
+                      [ngClass]="currentlyPlayingId() === file.id ? 'animate-bounce text-[#00FF41]' : ''">
+                      audiotrack
+                    </mat-icon>
+                    <span class="text-[9px] font-extrabold text-[#EEE] truncate font-mono" [title]="file.name">{{ file.name }}</span>
+                  </div>
+                  <span class="text-[6.5px] px-1 py-0.2 bg-[#0C0C0E] text-[#888] rounded whitespace-nowrap border border-[#333]/30 uppercase font-extrabold tracking-widest text-[#FFF]/60">
+                    {{ file.source.includes('Inside') ? 'SYSTEM_L' : (file.source.includes('Outside') ? 'ACOUS_M' : 'HYBRID') }}
+                  </span>
+                </div>
+
+                <!-- ULTRA VISIBLE DURATION CONVERTED TO MINUTES -->
+                <div class="flex justify-between items-center text-[7px] font-mono text-[#555] border-y border-[#1C1C1F]/40 py-0.5">
+                  <span>TIME: {{ file.date }}</span>
+                  <span class="text-[#999] font-bold flex items-center gap-0.5">
+                    <mat-icon class="text-[9px] h-2.5 w-2.5 flex items-center justify-center">timer</mat-icon>
+                    DURATION: {{ formatDurationDesc(file.duration) }}
+                  </span>
+                </div>
+
+                <div class="flex items-center justify-between text-[7px] font-mono">
+                  <span class="text-[#646464] font-bold">SIZE: {{ file.sizeStr }}</span>
+                  <div class="flex items-center gap-1.5">
+                    <button 
+                      (click)="playRecordedFile(file)"
+                      class="text-[6.5px] px-1.5 py-0.5 rounded border font-mono font-bold cursor-pointer transition-all flex items-center gap-0.5"
+                      [ngClass]="currentlyPlayingId() === file.id ? 'bg-[#00FF41] text-black border-[#00FF41]' : 'bg-[#050506]/85 text-[#00FF41] border-[#00FF41]/30 hover:border-[#00FF41] hover:bg-[#00FF41]/10'">
+                      <mat-icon class="text-[8px] h-2 w-2 flex items-center justify-center font-bold">{{ currentlyPlayingId() === file.id ? 'pause' : 'play_arrow' }}</mat-icon>
+                      {{ currentlyPlayingId() === file.id ? 'PAUSE' : 'PLAY' }}
+                    </button>
+                    <button 
+                      (click)="downloadRecordedFile(file)"
+                      title="Download stream segment"
+                      class="p-0.5 hover:bg-[#222] border border-[#222] hover:border-[#00FF41] text-[#666] hover:text-[#00FF41] rounded transition-all cursor-pointer">
+                      <mat-icon class="text-[9px] h-2.5 w-2.5 flex items-center justify-center">download</mat-icon>
+                    </button>
+                    <button 
+                      (click)="deleteRecordedFile(file.id)"
+                      title="Purge clip"
+                      class="p-0.5 hover:bg-[#FF4141]/10 border border-[#222] hover:border-[#FF4141] text-[#666] hover:text-[#FF4141] rounded transition-all cursor-pointer">
+                      <mat-icon class="text-[9px] h-2.5 w-2.5 flex items-center justify-center">delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            }
+
+            @if (recordedFiles().length === 0) {
+              <div class="text-center italic text-[#333] py-6 text-[8px] border border-dashed border-[#222] rounded flex flex-col justify-center items-center gap-1 font-mono">
+                <mat-icon class="text-[12px] h-3 w-3 flex items-center justify-center text-[#333]">settings_voice</mat-icon>
+                <span>Wave clips registry array vacant.</span>
+              </div>
+            }
+          </div>
+
+        </div>
+      </div>
+
+      <!-- WINDOW 8: Presets Tuning and Audio Oscillator Sweeper -->
+      <div class="border border-[#222] bg-[#0A0A0B] flex flex-col rounded overflow-hidden">
+        <div class="px-2 py-1 bg-[#121214] border-b border-[#222] flex items-center justify-between text-[9px] font-bold text-[#888] uppercase tracking-wider">
+          <div class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#00FF41]"></span>
+            <span>[W-08] Waves Tuner Synthesizers</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <button 
+              (click)="toggleSoundMute()"
+              class="text-[7px] font-bold uppercase px-1 rounded transition-colors block cursor-pointer border"
+              [ngClass]="muteSynth() ? 'bg-[#FF4141]/15 text-[#FF4141] border-[#FF4141]/30' : 'bg-[#00FF41]/15 text-[#00FF41] border-[#00FF41]/30'">
+              🔊 {{ muteSynth() ? 'SPEAKER_MUTED' : 'SPEA_ACTIVE' }}
+            </button>
+            <button 
+              (click)="soundActivatedAlert.set(!soundActivatedAlert())"
+              class="text-[7.5px] font-bold px-1 rounded transition-colors block cursor-pointer border ml-1"
+              [ngClass]="soundActivatedAlert() ? 'bg-[#00FF41]/15 text-[#00FF41] border-[#00FF41]/30' : 'bg-[#121214] text-[#444] border-[#222]'">
+              🚨 CHIME: {{ soundActivatedAlert() ? 'ON' : 'OFF' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="p-2.5 space-y-2.5 bg-[#050506]/40 text-[9px] font-mono">
+          <div class="flex items-center gap-1">
+            <span class="text-[#444] font-extrabold uppercase text-[7.5px]">FREQ PRESETS:</span>
+            <div class="flex-grow grid grid-cols-3 gap-1">
+              <button 
+                (click)="updateManualFreq(440)"
+                class="py-0.5 bg-[#121214]/80 border border-[#222] hover:border-[#00FF41] text-[#BBB] font-bold rounded cursor-pointer text-center text-[7.5px]">
+                440 Hz
+              </button>
+              <button 
+                (click)="updateManualFreq(1200)"
+                class="py-0.5 bg-[#121214]/80 border border-[#222] hover:border-[#00FF41] text-[#BBB] font-bold rounded cursor-pointer text-center text-[7.5px]">
+                1.2 kHz
+              </button>
+              <button 
+                (click)="updateManualFreq(1800)"
+                class="py-0.5 bg-[#121214]/80 border border-[#222] hover:border-[#00FF41] text-[#BBB] font-bold rounded cursor-pointer text-center text-[7.5px]">
+                1.8 kHz
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-[7px] text-[#666]">
+              <span>TUNER FREQUENCY SWEEP_SWAVE:</span>
+              <span class="text-[#00FF41] font-bold">{{ manualSynthFreq() }} Hz</span>
+            </div>
+            <input 
+              type="range" 
+              min="20" 
+              max="12000" 
+              step="1"
+              [ngModel]="manualSynthFreq()"
+              (ngModelChange)="updateManualFreq($event)"
+              class="w-full h-1 bg-[#222] appearance-none cursor-pointer accent-[#00FF41]" />
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- LOWER PANEL STATUS & LOG TERMINAL (Bottom expandable section) -->
+  <footer class="bg-[#0C0C0E] border-t border-[#222] flex flex-col bg-[#050506]/98 flex-shrink-0">
+    
+    <!-- Logging outputs console line -->
+    <div class="grid grid-cols-12 gap-px bg-[#1C1C1F] border-b border-[#222] flex-shrink-0">
+      
+      <!-- Signature Target Database window section (span-4) -->
+      <section class="col-span-4 bg-[#0A0A0B] p-2 flex flex-col h-[100px]">
+        <div class="flex justify-between items-center text-[8.5px] text-[#666] uppercase font-bold tracking-wider mb-1.5 border-b border-[#222]/30 pb-0.5">
+          <span>Target Signature Pattern Models</span>
+          <button 
+            (click)="showProfileCreator.set(!showProfileCreator())"
+            class="text-[7px] text-[#00FF41] bg-[#00FF41]/15 border border-[#00FF41]/30 hover:border-[#00FF41] px-1.5 rounded cursor-pointer transition-all uppercase font-bold">
+            {{ showProfileCreator() ? '✖ CLOSE' : '✚ ADD_PATTERN' }}
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto space-y-1 pr-1 min-h-0">
+          @if (showProfileCreator()) {
+            <div class="p-1.5 border border-[#FF7F00]/20 bg-[#FF7F00]/5 text-[7px] space-y-1 rounded font-mono">
+              <div class="grid grid-cols-2 gap-1">
+                <input 
+                  type="text"
+                  [ngModel]="creatorName()"
+                  (ngModelChange)="creatorName.set($event)"
+                  placeholder="ID Name e.g. Hum Meter"
+                  class="bg-[#050506] border border-[#222] px-1 py-0.5 text-[#FF7F00] focus:outline-none focus:border-[#FF7F00] text-[8px] rounded h-5 text-center" />
+                <input 
+                  type="number"
+                  [ngModel]="creatorFreq()"
+                  (ngModelChange)="creatorFreq.set($event)"
+                  placeholder="Freq (Hz)"
+                  class="bg-[#050506] border border-[#222] px-1 py-0.5 text-[#FF7F00] focus:outline-none focus:border-[#FF7F00] text-[8px] rounded h-5 text-center" />
+              </div>
+              <div class="grid grid-cols-2 gap-1">
+                <input 
+                  type="number"
+                  [ngModel]="creatorTolerance()"
+                  (ngModelChange)="creatorTolerance.set($event)"
+                  placeholder="Tolerance"
+                  class="bg-[#050506] border border-[#222] px-1 py-0.5 text-[#FF7F00] focus:outline-none focus:border-[#FF7F00] text-[8px] rounded h-5 text-center" />
+                <button 
+                  (click)="saveCustomProfile()"
+                  class="py-0.5 text-black bg-[#FF7F00] hover:bg-[#ff9024] font-bold uppercase rounded text-[7.5px] cursor-pointer tracking-wider transition-all h-5 border-0">
+                  SAVE NEW PATTERN
+                </button>
+              </div>
+            </div>
+          } @else {
+            <div class="grid grid-cols-2 gap-1.5 pr-0.5">
+              @for (prof of profiles(); track prof.id) {
+                <div 
+                  role="button"
+                  tabindex="0"
+                  (click)="selectProfile(prof.id)"
+                  (keydown.enter)="selectProfile(prof.id)"
+                  class="p-1 border cursor-pointer rounded transition-all flex items-center justify-between text-[8px]"
+                  [ngClass]="selectedProfileId() === prof.id ? 'bg-[#00FF41]/10 border-[#00FF41] text-[#00FF41]' : 'bg-[#121214]/60 border-[#1C1C1F] text-[#888] hover:border-[#333]'">
+                  <span class="font-bold truncate max-w-[55%]" [title]="prof.name">{{ prof.name }}</span>
+                  <span class="font-bold whitespace-nowrap text-[6.5px] text-[#888]">{{ prof.targetFreq }}Hz</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- Logging stream terminal log (span-8) -->
+      <section class="col-span-8 bg-[#0A0A0B] p-2 flex flex-col h-[100px] border-l border-[#222]">
+        <div class="flex justify-between items-center text-[8.5px] text-[#666] uppercase font-bold tracking-wider mb-1 px-1 border-b border-[#222]/30 pb-0.5">
+          <span>System Demultiplexing Signal Log Receiver</span>
+          <div class="flex gap-2 font-mono items-center">
+            <button (click)="clearLogs()" class="text-[7.5px] text-[#444] hover:text-[#00FF41] font-bold cursor-pointer transition-colors border-0 bg-transparent">CLEAR</button>
+            <span class="text-[#222]">|</span>
+            <button (click)="exportSessionData()" class="text-[7.5px] text-[#00FF41] bg-[#00FF41]/15 px-1 rounded font-bold hover:bg-[#00CC33] hover:text-black hover:font-bold border-0 cursor-pointer">EXPORT_LOG_JSON</button>
+          </div>
+        </div>
+
+        <div class="flex-grow overflow-y-auto space-y-1 px-1.5 pr-2 min-h-0 select-text">
+          @for (log of logs(); track log.timestamp) {
+            <div class="text-[8px] leading-tight font-mono">
+              <span class="text-[#444] font-bold">[{{ log.timeFormatted }}]</span>
+              <span 
+                class="ml-2 break-all font-mono"
+                [ngClass]="{
+                  'text-[#888]': log.type === 'info',
+                  'text-[#C5A550]': log.type === 'warn',
+                  'text-[#FF4141] font-bold': log.type === 'error',
+                  'text-[#00FF41] font-bold animate-pulse': log.type === 'match'
+                }">
+                {{ log.message }}
+              </span>
+            </div>
+          }
+
+          @if (logs().length === 0) {
+            <div class="text-center italic text-[#333] py-4 text-[8px]">
+              Demultiplexer trace records idle. Listening nodes registered.
+            </div>
+          }
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Telemetry Foot-line Status Matrix -->
+    <div class="p-2 flex flex-wrap items-center justify-between text-[9px] gap-2">
+      <div class="flex flex-wrap items-center gap-x-4 font-mono text-[#555]">
+        <div>
+          <span>SECURITY_TUNNEL:</span>
+          <span class="text-[#00FF41] font-bold ml-1.5 uppercase tracking-wide">SSL_AES_256_ACTIVE</span>
+        </div>
+        <div class="border-l border-[#222] pl-4">
+          <span>RECEIVER_ADC_RATE:</span>
+          <span class="text-[#00FF41] font-bold ml-1.5 uppercase">48.0kHz_AOT_FFT</span>
+        </div>
+      </div>
+      
+      <div class="flex gap-4 text-[#555] font-mono">
+        <span>DEV_LATENCY: <span class="text-[#00FF41] font-bold">12ms</span></span>
+        <span>IDLE_CYCLE: <span class="text-[#00FF41] font-bold">0.0s</span></span>
+        <!-- Stop current stream button -->
+        <button 
+          (click)="stopAudioSource()"
+          class="text-[8px] bg-[#FF4141]/10 text-[#FF4141] hover:bg-[#FF4141] hover:text-white px-2 py-0.5 rounded border border-[#FF4141]/30 uppercase transition-all font-mono cursor-pointer font-bold">
+          🛑 DISCONNECT_RECEIVER
+        </button>
+      </div>
+    </div>
+
+  </footer>
+
+</div>

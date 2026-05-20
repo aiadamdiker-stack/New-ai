@@ -1,0 +1,10 @@
+{
+  "name": "Signal Scan Analytics",
+  "description": "An interactive high-density audio signal analyzer and recognition dashboard designed for detecting hidden video and background browser audio frequencies.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
