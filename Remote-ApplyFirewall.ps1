@@ -1,187 +1,122 @@
-#Requires -RunAsAdministrator
-<#
-.SYNOPSIS
-    Удалённое применение правил фаервола к машине 10.148.48.26 через WinRM.
+param(
+    [string]$TargetIP = "10.148.48.26",
+    [string[]]$TrustedSubnets = @("10.148.48.0/24")
+)
 
-.DESCRIPTION
-    Запускается с любой Windows-машины в сети.
-    Подключается к 10.148.48.26 и применяет все правила харденинга.
+Write-Host "=== Remote Firewall Hardening ===" -ForegroundColor Cyan
+Write-Host "Target: $TargetIP" -ForegroundColor Cyan
 
-.NOTES
-    Требования:
-    - На 10.148.48.26 должен быть включён WinRM (Enable-PSRemoting -Force)
-    - Учётная запись с правами администратора на целевой машине
-    - Если машины не в домене, выполнить на ЭТОЙ машине:
-      Set-Item WSMan:\localhost\Client\TrustedHosts -Value "10.148.48.26" -Force
-#>
-
-$TargetIP = "10.148.48.26"
-$TrustedSubnets = @("10.148.48.0/24")
-
-# ============================================================
-# ПОДГОТОВКА
-# ============================================================
-
-Write-Host "============================================" -ForegroundColor Cyan
-Write-Host " Remote Firewall Hardening: $TargetIP" -ForegroundColor Cyan
-Write-Host "============================================" -ForegroundColor Cyan
-Write-Host ""
-
-# Добавить в TrustedHosts (для не-доменных машин)
-Write-Host "[*] Добавление $TargetIP в TrustedHosts..." -ForegroundColor Yellow
 Set-Item WSMan:\localhost\Client\TrustedHosts -Value $TargetIP -Force -ErrorAction SilentlyContinue
 
-# Запрос учётных данных
-Write-Host "[*] Введите учётные данные администратора на $TargetIP" -ForegroundColor Yellow
-$Cred = Get-Credential -Message "Логин и пароль администратора на $TargetIP"
-
-# ============================================================
-# ПРОВЕРКА СВЯЗИ
-# ============================================================
-
-Write-Host ""
-Write-Host "[*] Проверка доступности $TargetIP..." -ForegroundColor Yellow
+$Cred = Get-Credential -Message "Admin credentials for $TargetIP"
 
 if (-not (Test-Connection -ComputerName $TargetIP -Count 2 -Quiet)) {
-    Write-Host "[!] Хост $TargetIP недоступен. Проверьте сеть." -ForegroundColor Red
+    Write-Host "Host unreachable" -ForegroundColor Red
     exit 1
 }
-Write-Host "[+] Хост доступен." -ForegroundColor Green
+Write-Host "Host is up" -ForegroundColor Green
 
-# Проверка WinRM
-Write-Host "[*] Проверка WinRM..." -ForegroundColor Yellow
 try {
     Test-WSMan -ComputerName $TargetIP -Credential $Cred -ErrorAction Stop | Out-Null
-    Write-Host "[+] WinRM доступен." -ForegroundColor Green
+    Write-Host "WinRM OK" -ForegroundColor Green
 } catch {
-    Write-Host "[!] WinRM недоступен: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host ""
-    Write-Host "    Для включения WinRM на целевой машине выполните локально:" -ForegroundColor White
-    Write-Host '    Enable-PSRemoting -Force' -ForegroundColor White
-    Write-Host '    Set-NetFirewallRule -Name "WINRM-HTTP-In-TCP" -RemoteAddress Any' -ForegroundColor White
+    Write-Host "WinRM failed. Run on target: Enable-PSRemoting -Force" -ForegroundColor Red
     exit 1
 }
 
-# ============================================================
-# ПРИМЕНЕНИЕ ПРАВИЛ
-# ============================================================
+Write-Host "Applying rules..." -ForegroundColor Yellow
 
-Write-Host ""
-Write-Host "[*] Подключение и применение правил..." -ForegroundColor Yellow
+$Result = Invoke-Command -ComputerName $TargetIP -Credential $Cred -ArgumentList @(,$TrustedSubnets) -ScriptBlock {
+    param([string[]]$Trusted)
 
-$Result = Invoke-Command -ComputerName $TargetIP -Credential $Cred -ScriptBlock {
-    param([string[]]$TrustedSubnets)
-
-    $RulePrefix = "Hardening-"
-    $output = @{ Hostname = $env:COMPUTERNAME; Success = $true; Errors = @(); Rules = 0 }
+    $P = "Hardening-"
+    $out = @{ Host = $env:COMPUTERNAME; OK = $true; Err = @(); N = 0 }
 
     try {
-        # Точка восстановления
-        try {
-            Enable-ComputerRestore -Drive "C:\" -ErrorAction SilentlyContinue
-            Checkpoint-Computer -Description "Pre-Remote-Hardening" -RestorePointType MODIFY_SETTINGS -ErrorAction Stop
-        } catch { }
-
-        # Удалить старые правила
-        Get-NetFirewallRule -DisplayName "$($RulePrefix)*" -ErrorAction SilentlyContinue |
-            Remove-NetFirewallRule -ErrorAction SilentlyContinue
-
-        # Включить фаервол
+        Get-NetFirewallRule -DisplayName ($P + "*") -ErrorAction SilentlyContinue | Remove-NetFirewallRule -ErrorAction SilentlyContinue
         Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
 
-        # --- SMB 445 ---
-        New-NetFirewallRule -DisplayName "${RulePrefix}Block-SMB-445-Inbound" -Direction Inbound -Protocol TCP -LocalPort 445 -Action Block -Profile Any -Enabled True | Out-Null
-        $output.Rules++
-        foreach ($net in $TrustedSubnets) {
-            New-NetFirewallRule -DisplayName "${RulePrefix}Allow-SMB-445-From-$($net -replace '[/]','-')" -Direction Inbound -Protocol TCP -LocalPort 445 -RemoteAddress $net -Action Allow -Profile Any -Enabled True | Out-Null
-            $output.Rules++
+        # SMB 445
+        New-NetFirewallRule -DisplayName ($P + "Block-SMB-445") -Direction Inbound -Protocol TCP -LocalPort 445 -Action Block -Profile Any -Enabled True | Out-Null
+        $out.N++
+        foreach ($n in $Trusted) {
+            $rn = $n -replace "/","-"
+            New-NetFirewallRule -DisplayName ($P + "Allow-SMB-445-" + $rn) -Direction Inbound -Protocol TCP -LocalPort 445 -RemoteAddress $n -Action Allow -Profile Any -Enabled True | Out-Null
+            $out.N++
         }
 
-        # --- NetBIOS 139 ---
-        New-NetFirewallRule -DisplayName "${RulePrefix}Block-NetBIOS-139-Inbound" -Direction Inbound -Protocol TCP -LocalPort 139 -Action Block -Profile Any -Enabled True | Out-Null
-        $output.Rules++
-        foreach ($net in $TrustedSubnets) {
-            New-NetFirewallRule -DisplayName "${RulePrefix}Allow-NetBIOS-139-From-$($net -replace '[/]','-')" -Direction Inbound -Protocol TCP -LocalPort 139 -RemoteAddress $net -Action Allow -Profile Any -Enabled True | Out-Null
-            $output.Rules++
+        # NetBIOS 139
+        New-NetFirewallRule -DisplayName ($P + "Block-NetBIOS-139") -Direction Inbound -Protocol TCP -LocalPort 139 -Action Block -Profile Any -Enabled True | Out-Null
+        $out.N++
+        foreach ($n in $Trusted) {
+            $rn = $n -replace "/","-"
+            New-NetFirewallRule -DisplayName ($P + "Allow-NetBIOS-139-" + $rn) -Direction Inbound -Protocol TCP -LocalPort 139 -RemoteAddress $n -Action Allow -Profile Any -Enabled True | Out-Null
+            $out.N++
         }
 
-        # --- NetBIOS NS UDP 137 ---
-        New-NetFirewallRule -DisplayName "${RulePrefix}Block-NetBIOS-137-UDP-Inbound" -Direction Inbound -Protocol UDP -LocalPort 137 -Action Block -Profile Any -Enabled True | Out-Null
-        $output.Rules++
-        foreach ($net in $TrustedSubnets) {
-            New-NetFirewallRule -DisplayName "${RulePrefix}Allow-NetBIOS-137-UDP-From-$($net -replace '[/]','-')" -Direction Inbound -Protocol UDP -LocalPort 137 -RemoteAddress $net -Action Allow -Profile Any -Enabled True | Out-Null
-            $output.Rules++
+        # NetBIOS UDP 137
+        New-NetFirewallRule -DisplayName ($P + "Block-NetBIOS-137-UDP") -Direction Inbound -Protocol UDP -LocalPort 137 -Action Block -Profile Any -Enabled True | Out-Null
+        $out.N++
+        foreach ($n in $Trusted) {
+            $rn = $n -replace "/","-"
+            New-NetFirewallRule -DisplayName ($P + "Allow-NetBIOS-137-UDP-" + $rn) -Direction Inbound -Protocol UDP -LocalPort 137 -RemoteAddress $n -Action Allow -Profile Any -Enabled True | Out-Null
+            $out.N++
         }
 
-        # --- RPC 135 ---
-        New-NetFirewallRule -DisplayName "${RulePrefix}Block-RPC-135-Inbound" -Direction Inbound -Protocol TCP -LocalPort 135 -Action Block -Profile Any -Enabled True | Out-Null
-        $output.Rules++
-        foreach ($net in $TrustedSubnets) {
-            New-NetFirewallRule -DisplayName "${RulePrefix}Allow-RPC-135-From-$($net -replace '[/]','-')" -Direction Inbound -Protocol TCP -LocalPort 135 -RemoteAddress $net -Action Allow -Profile Any -Enabled True | Out-Null
-            $output.Rules++
+        # RPC 135
+        New-NetFirewallRule -DisplayName ($P + "Block-RPC-135") -Direction Inbound -Protocol TCP -LocalPort 135 -Action Block -Profile Any -Enabled True | Out-Null
+        $out.N++
+        foreach ($n in $Trusted) {
+            $rn = $n -replace "/","-"
+            New-NetFirewallRule -DisplayName ($P + "Allow-RPC-135-" + $rn) -Direction Inbound -Protocol TCP -LocalPort 135 -RemoteAddress $n -Action Allow -Profile Any -Enabled True | Out-Null
+            $out.N++
         }
 
-        # --- RPC Ephemeral 49152-65535 ---
-        New-NetFirewallRule -DisplayName "${RulePrefix}Block-RPC-Ephemeral-Inbound" -Direction Inbound -Protocol TCP -LocalPort 49152-65535 -Action Block -Profile Any -Enabled True | Out-Null
-        $output.Rules++
-        foreach ($net in $TrustedSubnets) {
-            New-NetFirewallRule -DisplayName "${RulePrefix}Allow-RPC-Ephemeral-From-$($net -replace '[/]','-')" -Direction Inbound -Protocol TCP -LocalPort 49152-65535 -RemoteAddress $net -Action Allow -Profile Any -Enabled True | Out-Null
-            $output.Rules++
+        # RPC Ephemeral
+        New-NetFirewallRule -DisplayName ($P + "Block-RPC-Ephemeral") -Direction Inbound -Protocol TCP -LocalPort 49152-65535 -Action Block -Profile Any -Enabled True | Out-Null
+        $out.N++
+        foreach ($n in $Trusted) {
+            $rn = $n -replace "/","-"
+            New-NetFirewallRule -DisplayName ($P + "Allow-RPC-Ephemeral-" + $rn) -Direction Inbound -Protocol TCP -LocalPort 49152-65535 -RemoteAddress $n -Action Allow -Profile Any -Enabled True | Out-Null
+            $out.N++
         }
 
-        # --- Block HTTPAPI 50131 ---
-        New-NetFirewallRule -DisplayName "${RulePrefix}Block-HTTPAPI-50131-Inbound" -Direction Inbound -Protocol TCP -LocalPort 50131 -Action Block -Profile Any -Enabled True | Out-Null
-        $output.Rules++
+        # HTTPAPI 50131
+        New-NetFirewallRule -DisplayName ($P + "Block-HTTPAPI-50131") -Direction Inbound -Protocol TCP -LocalPort 50131 -Action Block -Profile Any -Enabled True | Out-Null
+        $out.N++
 
-        # --- Block CDPSvc 5040 ---
-        New-NetFirewallRule -DisplayName "${RulePrefix}Block-CDPSvc-5040-Inbound" -Direction Inbound -Protocol TCP -LocalPort 5040 -Action Block -Profile Any -Enabled True | Out-Null
-        $output.Rules++
+        # CDPSvc 5040
+        New-NetFirewallRule -DisplayName ($P + "Block-CDPSvc-5040") -Direction Inbound -Protocol TCP -LocalPort 5040 -Action Block -Profile Any -Enabled True | Out-Null
+        $out.N++
 
-        # --- Логирование ---
-        $fwLog = "$env:SystemRoot\System32\LogFiles\Firewall\pfirewall.log"
+        # Logging
+        $fwLog = $env:SystemRoot + "\System32\LogFiles\Firewall\pfirewall.log"
         Set-NetFirewallProfile -Profile Domain,Private,Public -LogBlocked True -LogMaxSizeKilobytes 16384 -LogFileName $fwLog
 
-        # --- Отключение служб ---
+        # Disable services
         foreach ($svc in @("SSDPSRV", "upnphost", "CDPSvc")) {
             try {
                 Set-Service -Name $svc -StartupType Disabled -ErrorAction Stop
                 Stop-Service -Name $svc -Force -ErrorAction SilentlyContinue
             } catch {
-                $output.Errors += "$svc : $($_.Exception.Message)"
+                $out.Err += ($svc + ": " + $_.Exception.Message)
             }
         }
-
     } catch {
-        $output.Success = $false
-        $output.Errors += $_.Exception.Message
+        $out.OK = $false
+        $out.Err += $_.Exception.Message
     }
 
-    return $output
-
-} -ArgumentList @(,$TrustedSubnets)
-
-# ============================================================
-# РЕЗУЛЬТАТ
-# ============================================================
+    return $out
+}
 
 Write-Host ""
-Write-Host "============================================" -ForegroundColor Cyan
-Write-Host " Результат" -ForegroundColor Cyan
-Write-Host "============================================" -ForegroundColor Cyan
-
-if ($Result.Success) {
-    Write-Host "[+] УСПЕШНО применено на $($Result.Hostname) ($TargetIP)" -ForegroundColor Green
-    Write-Host "    Создано правил: $($Result.Rules)" -ForegroundColor White
+if ($Result.OK) {
+    Write-Host "SUCCESS on $($Result.Host) - $($Result.N) rules created" -ForegroundColor Green
 } else {
-    Write-Host "[!] ОШИБКА на $TargetIP" -ForegroundColor Red
+    Write-Host "FAILED on $TargetIP" -ForegroundColor Red
 }
-
-if ($Result.Errors.Count -gt 0) {
-    Write-Host "    Предупреждения:" -ForegroundColor Yellow
-    $Result.Errors | ForEach-Object { Write-Host "      - $_" -ForegroundColor Yellow }
+if ($Result.Err.Count -gt 0) {
+    Write-Host "Warnings:" -ForegroundColor Yellow
+    $Result.Err | ForEach-Object { Write-Host "  - $_" -ForegroundColor Yellow }
 }
-
-Write-Host ""
-Write-Host "[*] Для проверки правил на целевой машине:" -ForegroundColor White
-Write-Host '    Invoke-Command -ComputerName 10.148.48.26 -Credential $Cred -ScriptBlock { Get-NetFirewallRule -DisplayName "Hardening-*" | Format-Table DisplayName, Action, Enabled }' -ForegroundColor Gray
-Write-Host ""
